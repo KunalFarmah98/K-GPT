@@ -12,8 +12,8 @@ import javax.inject.Inject
 @HiltViewModel
 class GeminiViewModel @Inject constructor(private val networkRepository: GeminiRepository): ViewModel() {
 
-    fun generateRequest(models: Constants.GeminiModels = Constants.GeminiModels.GEMINI_2_0_FLASH_LITE, request: String) {
-        val url = "${models.modelName}:generateContent"
+    fun generateRequest(model: Constants.GeminiModels = Constants.GeminiModels.GEMINI_2_0_FLASH, request: String) {
+        val modelName = model.modelName + ":generateContent"
         val geminiRequest = GeminiRequest(
             contents = listOf(
                 GeminiRequest.Content(
@@ -27,7 +27,7 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
         )
 
         viewModelScope.launch {
-            networkRepository.generateContent(url, geminiRequest)
+            networkRepository.generateContent(modelName, geminiRequest)
         }
     }
 

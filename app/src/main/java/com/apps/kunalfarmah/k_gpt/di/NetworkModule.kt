@@ -17,10 +17,10 @@ object NetworkModule {
 
     @Provides
     fun provideGeminiRetrofit() : Retrofit {
+        val networkJson = Json { ignoreUnknownKeys = true }
         return Retrofit.Builder()
             .baseUrl(GEMINI_BASE_URL)
-            .addConverterFactory(Json.asConverterFactory(
-                "application/json; charset=UTF8".toMediaType()))
+            .addConverterFactory(networkJson.asConverterFactory("application/json".toMediaType())) // should add it at last
             .build()
     }
 
