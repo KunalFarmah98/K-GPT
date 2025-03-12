@@ -1,3 +1,9 @@
+import java.util.*
+val properties = Properties().apply {
+    rootProject.file("local.properties").reader().use(::load)
+}
+val apiKey = properties["apiKey"] as String
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -19,6 +25,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "API_KEY", apiKey)
     }
 
     buildTypes {
@@ -39,6 +46,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -53,8 +61,10 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.compose.navigation)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
+    implementation(libs.okhttp3)
     implementation(libs.lifecycle.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
