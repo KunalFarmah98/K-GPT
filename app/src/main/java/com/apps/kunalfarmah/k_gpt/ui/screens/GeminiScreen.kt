@@ -45,12 +45,14 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
         }
     }
 
-    Column(modifier = modifier
-        .fillMaxSize()
-        .padding(bottom = 10.dp)
-        .imePadding()) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding()
+    ) {
         LazyColumn(
             modifier = Modifier
+                .padding(8.dp)
                 .fillMaxWidth()
                 .weight(1f),
             state = listState
