@@ -37,27 +37,27 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
         )
 
 
-        viewModelScope.launch {
-            _isLoading.value = true
-            _messages.value = _messages.value + Message(isUser = true, text = request)
-            delay(2000)
-            _isLoading.value = false
-            _messages.value = _messages.value + Message(isUser = false, text = "Hello there")
-        }
-
-
 //        viewModelScope.launch {
 //            _isLoading.value = true
 //            _messages.value = _messages.value + Message(isUser = true, text = request)
-//            val response = networkRepository.generateContent(modelName, geminiRequest)
-//            var message = if(response.candidates.isEmpty()){
-//                Message(isUser = false, text = "Something went wrong")
-//            } else{
-//                Message(isUser = false, text = response.candidates[0].content.parts[0].text.trim())
-//            }
+//            delay(2000)
 //            _isLoading.value = false
-//            _messages.value = _messages.value + message
+//            _messages.value = _messages.value + Message(isUser = false, text = "Hello there")
 //        }
+
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            _messages.value = _messages.value + Message(isUser = true, text = request)
+            val response = networkRepository.generateContent(modelName, geminiRequest)
+            var message = if(response.candidates.isEmpty()){
+                Message(isUser = false, text = "Something went wrong")
+            } else{
+                Message(isUser = false, text = response.candidates[0].content.parts[0].text.trim())
+            }
+            _isLoading.value = false
+            _messages.value = _messages.value + message
+        }
     }
 
 }
