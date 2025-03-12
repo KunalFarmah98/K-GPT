@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.okhttp3)
     implementation(libs.lifecycle.compose)
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)
 
     testImplementation(libs.junit)

@@ -16,6 +16,7 @@ lifecycle-compose = "2.8.7"
 hilt = "2.51.1"
 ksp = "2.1.10-1.0.31"
 okhttp = "4.12.0"
+hilt-navigation = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,7 @@ kotlinx-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serializat
 lifecycle-compose = {module = "androidx.lifecycle:lifecycle-runtime-compose-android", version.ref = "lifecycle-compose"}
 hilt-android = {module = "com.google.dagger:hilt-android", version.ref = "hilt"}
 hilt-android-compiler = {module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt"}
+hilt-navigation-compose = {module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
