@@ -1,12 +1,8 @@
 package com.apps.kunalfarmah.k_gpt.ui.components
 
-import android.R
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateInt
-import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -65,6 +61,7 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping
                 .weight(2f)
                 .clickable {
                     onSend(text.value)
+                    text.value = ""
                     onSubmit()
                 },
             contentAlignment = Alignment.Center
@@ -95,9 +92,9 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
     }
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = if (isUser) Alignment.End else Alignment.Start) {
         Box(
-            modifier = boxModifier.widthIn(max = (screenWidth*0.8f).toInt().dp)
+            modifier = boxModifier.widthIn(min = 50.dp, max = (screenWidth*0.8f).toInt().dp)
         ) {
-            Text(modifier = Modifier.padding(10.dp), text = message.text)
+            Text(modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, text = message.text)
         }
         if(!isThinking){
             Text(modifier = Modifier.padding(top = 2.dp, end = if(isUser) 10.dp else 0.dp, start = if(isUser) 0.dp else 10.dp), textAlign = TextAlign.Center, text = getDate(message.time), fontSize = 10.sp)
