@@ -10,6 +10,7 @@ import retrofit2.http.Query
 import retrofit2.http.Path
 
 interface GeminiApi {
+    // incorporate :generateContent as a part of custom path to prevent retrofit from confusing the ':'
     @POST("models/{model}")
     suspend fun generateContent(
         @Path("model") model: String,
