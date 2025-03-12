@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.constraint.layout)
     implementation(libs.compose.navigation)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit)

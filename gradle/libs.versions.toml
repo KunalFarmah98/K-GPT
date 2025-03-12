@@ -17,6 +17,7 @@ hilt = "2.51.1"
 ksp = "2.1.10-1.0.31"
 okhttp = "4.12.0"
 hilt-navigation = "1.2.0"
+constraint-layout = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,6 +43,7 @@ lifecycle-compose = {module = "androidx.lifecycle:lifecycle-runtime-compose-andr
 hilt-android = {module = "com.google.dagger:hilt-android", version.ref = "hilt"}
 hilt-android-compiler = {module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt"}
 hilt-navigation-compose = {module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation"}
+constraint-layout = {module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraint-layout"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

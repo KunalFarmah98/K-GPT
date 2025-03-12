@@ -10,64 +10,110 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 
 @Preview
 @Composable
 fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping: () -> Unit = {}, onSubmit: () -> Unit = {}){
-    var text = rememberSaveable {
+    var text by rememberSaveable {
         mutableStateOf("")
     }
-    Row(modifier= modifier
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    ConstraintLayout(modifier= modifier
         .fillMaxWidth()
-        ,horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically) {
+        ) {
+        val (textField, sendButton) = createRefs()
         TextField(
-            modifier = Modifier.weight(8f),
+            modifier = Modifier
+                .constrainAs(textField) {
+                    start.linkTo(parent.start)
+                    end.linkTo(sendButton.start)
+                    top.linkTo(parent.top)
+                    width = Dimension.fillToConstraints
+                }
+                .padding(8.dp),
             placeholder = { Text("Enter your message") },
-            value = text.value,
+            value = text,
+            shape = RoundedCornerShape(16.dp),
             onValueChange = {
                 onTyping()
-                text.value = it
+                text = it
             },
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent, // Hide the indicator line when focused
+                unfocusedIndicatorColor = Color.Transparent, // Hide the indicator line when not focused
+                disabledIndicatorColor = Color.Transparent // Hide the indicator line when disabled
+            )
         )
-        Box(
-            modifier = Modifier
-                .weight(2f)
+        Card(
+            modifier
+                .constrainAs(sendButton) {
+                    end.linkTo(parent.end)
+                    bottom.linkTo(textField.bottom)
+                }
+                .padding(end = 8.dp, bottom = 8.dp)
+                .size(50.dp)
                 .clickable {
-                    onSend(text.value)
-                    text.value = ""
+                    onSend(text)
+                    text = ""
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
                     onSubmit()
                 },
-            contentAlignment = Alignment.Center
+            shape = CircleShape,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            )
         ) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "send")
+            Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    contentDescription = "send",
+                    modifier = Modifier
+                        .size(25.dp)
+                )
+            }
+
         }
+
     }
 }
 
