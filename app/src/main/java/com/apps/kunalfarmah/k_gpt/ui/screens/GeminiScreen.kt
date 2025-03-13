@@ -14,14 +14,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.apps.kunalfarmah.k_gpt.Constants
 import com.apps.kunalfarmah.k_gpt.ui.components.ChatBubble
 import com.apps.kunalfarmah.k_gpt.ui.components.Input
+import com.apps.kunalfarmah.k_gpt.ui.components.ModelSpinner
 import com.apps.kunalfarmah.k_gpt.ui.components.ThinkingBubble
 import com.apps.kunalfarmah.k_gpt.viewmodel.GeminiViewModel
 import kotlinx.coroutines.launch
@@ -33,6 +36,9 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    var model by rememberSaveable {
+        mutableStateOf(Constants.GeminiModels.GEMINI_2_0_FLASH)
+    }
     var isTyping by remember{
         mutableStateOf(false)
     }
@@ -50,6 +56,7 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
             .fillMaxSize()
             .imePadding()
     ) {
+        ModelSpinner(onModelSelected = {model = it})
         LazyColumn(
             modifier = Modifier
                 .padding(8.dp)
@@ -70,7 +77,7 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
             }
         }
         Input(onTyping = {isTyping = true}, onSubmit = {isTyping = false}, onSend = {
-            viewModel.generateRequest(request = it)
+            viewModel.generateRequest(model = model, request = it)
         })
     }
 }

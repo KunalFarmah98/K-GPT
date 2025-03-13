@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,8 +21,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,23 +39,30 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.apps.kunalfarmah.k_gpt.Constants
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
+import kotlin.math.roundToInt
 
 @Preview
 @Composable
@@ -173,6 +186,76 @@ fun ThinkingBubble(modifier: Modifier = Modifier) {
     )
     val text = "Thinking" + ".".repeat(dots.toInt())
     ChatBubble(message = Message(text = text, isUser = false), modifier = modifier, isThinking = true)
+}
+
+
+@Preview
+@Composable
+fun ModelSpinner(modifier: Modifier = Modifier, onModelSelected: (Constants.GeminiModels) -> Unit = {}) {
+    var expanded by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var selectedModel by rememberSaveable {
+        mutableStateOf(Constants.GeminiModels.GEMINI_2_0_FLASH)
+    }
+    val modelsList = listOf(
+        Constants.GeminiModels.GEMINI_2_0_FLASH,
+        Constants.GeminiModels.GEMINI_2_0_FLASH_LITE,
+        Constants.GeminiModels.GEMINI_1_5_FLASH,
+        Constants.GeminiModels.GEMINI_1_5_PRO
+    )
+    var parentWidth by remember {
+        mutableStateOf(0.dp)
+    }
+
+    Row (modifier = modifier
+        .fillMaxWidth()
+        .padding(top = 10.dp, end = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End){
+        Text(text = "AI Model:  ")
+        Box(modifier = Modifier
+            .onGloballyPositioned {
+                parentWidth = it.size.toSize().width.dp
+            }){
+            Text(
+                text = selectedModel.modelName,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .clip(RectangleShape)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(2.dp)
+                    .width(175.dp)
+                    .clickable {
+                        expanded = true
+                    }
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                },
+                offset = DpOffset(parentWidth.minus(10.dp).value.roundToInt().dp, 0.dp)
+
+            ) {
+                modelsList.forEachIndexed { index, item ->
+                    DropdownMenuItem(
+                        text = { Text(item.modelName) },
+                        onClick = {
+                            expanded = false
+                            selectedModel = item
+                            onModelSelected(item)
+                        }
+                    )
+                }
+            }
+        }
+
+        Icon(
+            modifier = modifier.clickable {
+                expanded = true
+            }, imageVector = if(!expanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp, contentDescription = "select model")
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
