@@ -6,6 +6,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -105,7 +106,7 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping
                     bottom.linkTo(textField.bottom)
                 }
                 .padding(end = 8.dp, bottom = 8.dp)
-                .size(50.dp)
+                .size(55.dp)
                 .clickable {
                     onSend(text)
                     text = ""
@@ -155,7 +156,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
         Box(
             modifier = boxModifier.widthIn(min = 50.dp, max = (screenWidth*0.8f).toInt().dp)
         ) {
-            Text(modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, text = message.text)
+            Text(modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, text = message.text, color = MaterialTheme.colorScheme.onPrimary)
         }
         if(!isThinking){
             Text(modifier = Modifier.padding(top = 2.dp, end = if(isUser) 10.dp else 0.dp, start = if(isUser) 0.dp else 10.dp), textAlign = TextAlign.Center, text = getDate(message.time), fontSize = 10.sp)
@@ -210,18 +211,18 @@ fun ModelSpinner(modifier: Modifier = Modifier, onModelSelected: (Constants.Gemi
     Row (modifier = modifier
         .fillMaxWidth()
         .padding(top = 10.dp, end = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End){
-        Text(text = "AI Model:  ")
+        Text(text = "AI Model:  ", color = MaterialTheme.colorScheme.onSurface)
         Box(modifier = Modifier
             .onGloballyPositioned {
                 parentWidth = it.size.toSize().width.dp
             }){
             Text(
                 text = selectedModel.modelName,
-                color = Color.White,
                 textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .clip(RectangleShape)
-                    .background(MaterialTheme.colorScheme.primary)
+                    .border(width = 1.dp, color = MaterialTheme.colorScheme.primary)
                     .padding(2.dp)
                     .width(175.dp)
                     .clickable {
