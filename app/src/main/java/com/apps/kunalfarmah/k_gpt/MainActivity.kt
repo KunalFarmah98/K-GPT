@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
+import com.apps.kunalfarmah.k_gpt.navigation.AppNavigator
 import com.apps.kunalfarmah.k_gpt.ui.components.AppBar
-import com.apps.kunalfarmah.k_gpt.ui.screens.GeminiScreen
+import com.apps.kunalfarmah.k_gpt.ui.components.BottomTabBar
 import com.apps.kunalfarmah.k_gpt.ui.theme.KGPTTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -20,13 +22,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             KGPTTheme {
+                val navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     topBar = {
                         AppBar(title = resources.getString(R.string.app_name))
+                    },
+                    bottomBar = {
+                        BottomTabBar(navController = navController)
                     }
                 ) { innerPadding ->
-                    GeminiScreen(modifier = Modifier
-                        .padding(innerPadding))
+                    AppNavigator(navController, Modifier.padding(innerPadding))
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.apps.kunalfarmah.k_gpt.ui.components
 
+import android.util.Log
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -12,14 +13,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BottomAppBar
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -37,6 +43,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,8 +66,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.apps.kunalfarmah.k_gpt.Constants
 import com.apps.kunalfarmah.k_gpt.data.Message
+import com.apps.kunalfarmah.k_gpt.ui.screens.bottomTabs
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 import kotlin.math.roundToInt
 
@@ -119,7 +133,7 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping
                 containerColor = MaterialTheme.colorScheme.primary
             )
         ) {
-            Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+            Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "send",
@@ -271,4 +285,49 @@ fun AppBar(title: String = "Gemini") {
             titleContentColor = MaterialTheme.colorScheme.onPrimary
         )
     )
+}
+
+@Preview
+@Composable
+fun BottomTabBar(modifier: Modifier = Modifier, navController: NavHostController = rememberNavController()){
+    BottomNavigation(
+        windowInsets = WindowInsets.navigationBars,
+        backgroundColor = MaterialTheme.colorScheme.primary
+    ) {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
+        bottomTabs.forEach { item ->
+            BottomNavigationItem(
+                icon = {
+                    Icon(
+                        item.icon,
+                        contentDescription = item.name
+                    )
+                },
+                label = { Text(item.name) },
+                selected = currentDestination?.hierarchy?.any {
+                    it.hasRoute(
+                        item.route::class
+                    )
+                } == true,
+                onClick = {
+                    navController.navigate(item.route) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // re-selecting the same item
+                        launchSingleTop = true
+                        // Restore state when re-selecting a previously selected item
+                        restoreState = true
+                    }
+                },
+                selectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                unselectedContentColor = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+    }
 }

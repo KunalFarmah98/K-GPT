@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,11 +28,12 @@ import com.apps.kunalfarmah.k_gpt.ui.components.Input
 import com.apps.kunalfarmah.k_gpt.ui.components.ModelSpinner
 import com.apps.kunalfarmah.k_gpt.ui.components.ThinkingBubble
 import com.apps.kunalfarmah.k_gpt.viewmodel.GeminiViewModel
+import com.apps.kunalfarmah.k_gpt.viewmodel.OpenAIViewModel
 import kotlinx.coroutines.launch
 
 @Preview
 @Composable
-fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hiltViewModel()) {
+fun OpenAIScreen(modifier: Modifier = Modifier, viewModel: OpenAIViewModel = hiltViewModel()) {
     var messages = viewModel.messages.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
@@ -56,6 +58,7 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
             .fillMaxSize()
             .imePadding()
     ) {
+        Text("Open AI")
         ModelSpinner(onModelSelected = {model = it})
         LazyColumn(
             modifier = Modifier
@@ -76,8 +79,8 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
                 }
             }
         }
-        Input(onTyping = {isTyping = true}, onSubmit = {isTyping = false}, onSend = {
-            if(it.isNotBlank()) {
+        Input(onTyping = { isTyping = true }, onSubmit = { isTyping = false }, onSend = {
+            if (it.isNotBlank()) {
                 viewModel.generateRequest(model = model, request = it)
             }
         })

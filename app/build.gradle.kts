@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.retrofit.converter)
     implementation(libs.okhttp3)
     implementation(libs.lifecycle.compose)
+    implementation(libs.androidx.compose.material)
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)
