@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,12 +21,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.apps.kunalfarmah.k_gpt.Constants
+import com.apps.kunalfarmah.k_gpt.OpenAIModels
 import com.apps.kunalfarmah.k_gpt.ui.components.ChatBubble
 import com.apps.kunalfarmah.k_gpt.ui.components.Input
 import com.apps.kunalfarmah.k_gpt.ui.components.ModelSpinner
 import com.apps.kunalfarmah.k_gpt.ui.components.ThinkingBubble
-import com.apps.kunalfarmah.k_gpt.viewmodel.GeminiViewModel
 import com.apps.kunalfarmah.k_gpt.viewmodel.OpenAIViewModel
 import kotlinx.coroutines.launch
 
@@ -39,7 +37,7 @@ fun OpenAIScreen(modifier: Modifier = Modifier, viewModel: OpenAIViewModel = hil
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     var model by rememberSaveable {
-        mutableStateOf(Constants.GeminiModels.GEMINI_2_0_FLASH)
+        mutableStateOf(OpenAIModels.GPT_4O_MINI.modelName)
     }
     var isTyping by remember{
         mutableStateOf(false)
@@ -58,7 +56,7 @@ fun OpenAIScreen(modifier: Modifier = Modifier, viewModel: OpenAIViewModel = hil
             .fillMaxSize()
             .imePadding()
     ) {
-        ModelSpinner(onModelSelected = {model = it})
+        ModelSpinner(type = "OpenAI", onModelSelected = {model = it})
         LazyColumn(
             modifier = Modifier
                 .padding(8.dp)

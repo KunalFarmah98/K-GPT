@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.apps.kunalfarmah.k_gpt.Constants
+import com.apps.kunalfarmah.k_gpt.GeminiModels
 import com.apps.kunalfarmah.k_gpt.ui.components.ChatBubble
 import com.apps.kunalfarmah.k_gpt.ui.components.Input
 import com.apps.kunalfarmah.k_gpt.ui.components.ModelSpinner
@@ -37,7 +38,7 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     var model by rememberSaveable {
-        mutableStateOf(Constants.GeminiModels.GEMINI_2_0_FLASH)
+        mutableStateOf(GeminiModels.GEMINI_2_0_FLASH.modelName)
     }
     var isTyping by remember{
         mutableStateOf(false)
@@ -56,7 +57,7 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
             .fillMaxSize()
             .imePadding()
     ) {
-        ModelSpinner(onModelSelected = {model = it})
+        ModelSpinner(type = "Gemini", onModelSelected = {model = it})
         LazyColumn(
             modifier = Modifier
                 .padding(8.dp)

@@ -2,7 +2,8 @@ import java.util.*
 val properties = Properties().apply {
     rootProject.file("local.properties").reader().use(::load)
 }
-val apiKey = properties["apiKey"] as String
+val geminiApiKey = properties["geminiApiKey"] as String
+val openAIApiKey = properties["openAIApiKey"] as String
 
 plugins {
     alias(libs.plugins.android.application)
@@ -25,7 +26,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_KEY", apiKey)
+        buildConfigField("String", "GEMINI_API_KEY", geminiApiKey)
+        buildConfigField("String", "OPEN_AI_API_KEY", openAIApiKey)
     }
 
     buildTypes {

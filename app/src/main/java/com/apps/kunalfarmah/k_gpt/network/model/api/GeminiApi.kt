@@ -14,7 +14,7 @@ interface GeminiApi {
     @POST("models/{model}")
     suspend fun generateContent(
         @Path("model") model: String,
-        @Query("key") key: String = BuildConfig.API_KEY,
+        @Query("key") key: String = BuildConfig.GEMINI_API_KEY,
         @Body body: GeminiRequest
     ): Response<GeminiResponse>
 }

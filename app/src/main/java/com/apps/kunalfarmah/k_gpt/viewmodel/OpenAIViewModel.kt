@@ -1,10 +1,12 @@
 package com.apps.kunalfarmah.k_gpt.viewmodel
 
+import android.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apps.kunalfarmah.k_gpt.Constants
+import com.apps.kunalfarmah.k_gpt.OpenAIModels
 import com.apps.kunalfarmah.k_gpt.data.Message
-import com.apps.kunalfarmah.k_gpt.network.model.GeminiRequest
+import com.apps.kunalfarmah.k_gpt.network.model.OpenAIRequest
 import com.apps.kunalfarmah.k_gpt.repository.OpenAIRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,20 +23,17 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading.asStateFlow()
 
-    fun generateRequest(model: Constants.GeminiModels = Constants.GeminiModels.GEMINI_2_0_FLASH, request: String) {
-        val modelName = model.modelName + ":generateContent"
-        val geminiRequest = GeminiRequest(
-            contents = listOf(
-                GeminiRequest.Content(
-                    parts = listOf(
-                        GeminiRequest.Content.Part(
-                            text = request
-                        )
-                    )
+    fun generateRequest(model: String = OpenAIModels.GPT_4O_MINI.modelName, request: String) {
+
+        val openAIRequest = OpenAIRequest(
+            model = model,
+            messages = listOf(
+                OpenAIRequest.Message(
+                    role = "user",
+                    content = request
                 )
             )
         )
-
 
 //        viewModelScope.launch {
 //            _isLoading.value = true
@@ -48,11 +47,11 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
         viewModelScope.launch {
             _isLoading.value = true
             _messages.value = _messages.value + Message(isUser = true, text = request)
-            val response = networkRepository.generateContent(modelName, geminiRequest)
-            var message = if(response.candidates.isEmpty()){
+            val response = networkRepository.generateContent(openAIRequest)
+            var message = if(response.choices.isEmpty()){
                 Message(isUser = false, text = "Something went wrong")
             } else{
-                Message(isUser = false, text = response.candidates[0].content.parts[0].text.trim())
+                Message(isUser = false, text = response.choices[0].message.content.trim())
             }
             _isLoading.value = false
             _messages.value = _messages.value + message

@@ -1,20 +1,18 @@
 package com.apps.kunalfarmah.k_gpt.network.model.api
 
 import com.apps.kunalfarmah.k_gpt.BuildConfig
-import com.apps.kunalfarmah.k_gpt.network.model.GeminiRequest
-import com.apps.kunalfarmah.k_gpt.network.model.GeminiResponse
+import com.apps.kunalfarmah.k_gpt.network.model.OpenAIRequest
+import com.apps.kunalfarmah.k_gpt.network.model.OpenAIResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.POST
-import retrofit2.http.Query
-import retrofit2.http.Path
 
 interface OpenAIApi {
-    // incorporate :generateContent as a part of custom path to prevent retrofit from confusing the ':'
-    @POST("models/{model}")
+    @POST("chat/completions")
     suspend fun generateContent(
-        @Path("model") model: String,
-        @Query("key") key: String = BuildConfig.API_KEY,
-        @Body body: GeminiRequest
-    ): Response<GeminiResponse>
+        @Header("Authorization") auth:String = "Bearer ${BuildConfig.OPEN_AI_API_KEY}",
+        @Header("content-type") contentType: String =  "application/json",
+        @Body body: OpenAIRequest
+    ): Response<OpenAIResponse>
 }

@@ -84,7 +84,7 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    ConstraintLayout(modifier= modifier
+    ConstraintLayout(modifier= modifier.padding(bottom = 2.dp)
         .fillMaxWidth()
         ) {
         val (textField, sendButton) = createRefs()
@@ -202,19 +202,21 @@ fun ThinkingBubble(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-fun ModelSpinner(modifier: Modifier = Modifier, onModelSelected: (Constants.GeminiModels) -> Unit = {}) {
+fun ModelSpinner(modifier: Modifier = Modifier, type: String = "Gemini", onModelSelected: (String) -> Unit = {}) {
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
-    var selectedModel by rememberSaveable {
-        mutableStateOf(Constants.GeminiModels.GEMINI_2_0_FLASH)
+    val modelsList = type.let {
+        if(it=="Gemini"){
+            Constants.geminiModels
+        }
+        else{
+            Constants.openAIModels
+        }
     }
-    val modelsList = listOf(
-        Constants.GeminiModels.GEMINI_2_0_FLASH,
-        Constants.GeminiModels.GEMINI_2_0_FLASH_LITE,
-        Constants.GeminiModels.GEMINI_1_5_FLASH,
-        Constants.GeminiModels.GEMINI_1_5_PRO
-    )
+    var selectedModel by rememberSaveable {
+        mutableStateOf(modelsList[0])
+    }
     var parentWidth by remember {
         mutableStateOf(0.dp)
     }
@@ -228,7 +230,7 @@ fun ModelSpinner(modifier: Modifier = Modifier, onModelSelected: (Constants.Gemi
                 parentWidth = it.size.toSize().width.dp
             }){
             Text(
-                text = selectedModel.modelName,
+                text = selectedModel,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
@@ -250,7 +252,7 @@ fun ModelSpinner(modifier: Modifier = Modifier, onModelSelected: (Constants.Gemi
             ) {
                 modelsList.forEachIndexed { index, item ->
                     DropdownMenuItem(
-                        text = { Text(item.modelName) },
+                        text = { Text(item) },
                         onClick = {
                             expanded = false
                             selectedModel = item
