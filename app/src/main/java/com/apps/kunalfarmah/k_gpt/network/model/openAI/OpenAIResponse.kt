@@ -1,9 +1,8 @@
-package com.apps.kunalfarmah.k_gpt.network.model
+package com.apps.kunalfarmah.k_gpt.network.model.openAI
 
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.json.JSONObject
 
 @Serializable
 data class OpenAIResponse(

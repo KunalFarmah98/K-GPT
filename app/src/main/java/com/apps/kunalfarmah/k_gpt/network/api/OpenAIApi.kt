@@ -1,8 +1,8 @@
-package com.apps.kunalfarmah.k_gpt.network.model.api
+package com.apps.kunalfarmah.k_gpt.network.api
 
 import com.apps.kunalfarmah.k_gpt.BuildConfig
-import com.apps.kunalfarmah.k_gpt.network.model.OpenAIRequest
-import com.apps.kunalfarmah.k_gpt.network.model.OpenAIResponse
+import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIRequest
+import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Header

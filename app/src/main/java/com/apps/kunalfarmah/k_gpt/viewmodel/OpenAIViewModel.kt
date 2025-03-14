@@ -1,12 +1,10 @@
 package com.apps.kunalfarmah.k_gpt.viewmodel
 
-import android.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.apps.kunalfarmah.k_gpt.Constants
 import com.apps.kunalfarmah.k_gpt.OpenAIModels
 import com.apps.kunalfarmah.k_gpt.data.Message
-import com.apps.kunalfarmah.k_gpt.network.model.OpenAIRequest
+import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIRequest
 import com.apps.kunalfarmah.k_gpt.repository.OpenAIRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

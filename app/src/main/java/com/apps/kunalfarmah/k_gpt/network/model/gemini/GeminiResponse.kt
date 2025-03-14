@@ -1,5 +1,4 @@
-package com.apps.kunalfarmah.k_gpt.network.model
-
+package com.apps.kunalfarmah.k_gpt.network.model.gemini
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

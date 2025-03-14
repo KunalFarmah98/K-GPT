@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.apps.kunalfarmah.k_gpt.Constants
 import com.apps.kunalfarmah.k_gpt.GeminiModels
 import com.apps.kunalfarmah.k_gpt.data.Message
-import com.apps.kunalfarmah.k_gpt.network.model.GeminiRequest
+import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiRequest
 import com.apps.kunalfarmah.k_gpt.repository.GeminiRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay

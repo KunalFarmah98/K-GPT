@@ -1,8 +1,8 @@
 package com.apps.kunalfarmah.k_gpt.repository
 
-import com.apps.kunalfarmah.k_gpt.network.model.OpenAIRequest
-import com.apps.kunalfarmah.k_gpt.network.model.OpenAIResponse
-import com.apps.kunalfarmah.k_gpt.network.model.api.OpenAIApi
+import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIRequest
+import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIResponse
+import com.apps.kunalfarmah.k_gpt.network.api.OpenAIApi
 import javax.inject.Inject
 
 class OpenAIRepository @Inject constructor(private val openAIApi: OpenAIApi) {

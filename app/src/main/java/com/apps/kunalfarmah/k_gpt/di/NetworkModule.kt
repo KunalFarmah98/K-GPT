@@ -2,8 +2,8 @@ package com.apps.kunalfarmah.k_gpt.di
 
 import com.apps.kunalfarmah.k_gpt.Constants.GEMINI_BASE_URL
 import com.apps.kunalfarmah.k_gpt.Constants.OPEN_AI_BASE_URL
-import com.apps.kunalfarmah.k_gpt.network.model.api.GeminiApi
-import com.apps.kunalfarmah.k_gpt.network.model.api.OpenAIApi
+import com.apps.kunalfarmah.k_gpt.network.api.GeminiApi
+import com.apps.kunalfarmah.k_gpt.network.api.OpenAIApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

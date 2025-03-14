@@ -1,4 +1,4 @@
-package com.apps.kunalfarmah.k_gpt.network.model
+package com.apps.kunalfarmah.k_gpt.network.model.openAI
 
 
 import kotlinx.serialization.SerialName
