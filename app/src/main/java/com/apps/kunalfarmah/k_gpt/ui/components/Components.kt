@@ -1,6 +1,5 @@
 package com.apps.kunalfarmah.k_gpt.ui.components
 
-import android.util.Log
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -23,13 +22,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomAppBar
-import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -43,7 +41,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -290,21 +287,18 @@ fun AppBar(title: String = "Gemini") {
 @Preview
 @Composable
 fun BottomTabBar(modifier: Modifier = Modifier, navController: NavHostController = rememberNavController()){
-    BottomNavigation(
-        windowInsets = WindowInsets.navigationBars,
-        backgroundColor = MaterialTheme.colorScheme.primary
-    ) {
+    BottomAppBar{
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
         bottomTabs.forEach { item ->
             BottomNavigationItem(
                 icon = {
-                    Icon(
+                    androidx.compose.material.Icon(
                         item.icon,
                         contentDescription = item.name
                     )
                 },
-                label = { Text(item.name) },
+                label = { androidx.compose.material.Text(item.name) },
                 selected = currentDestination?.hierarchy?.any {
                     it.hasRoute(
                         item.route::class
@@ -325,8 +319,8 @@ fun BottomTabBar(modifier: Modifier = Modifier, navController: NavHostController
                         restoreState = true
                     }
                 },
-                selectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                unselectedContentColor = MaterialTheme.colorScheme.onSurface,
+                selectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                unselectedContentColor = Color.Gray,
             )
         }
     }
