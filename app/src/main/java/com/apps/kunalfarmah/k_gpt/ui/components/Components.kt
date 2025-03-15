@@ -362,7 +362,11 @@ fun AppBar(title: String = "Gemini", onClear: (String?) -> Unit = {}, onHistory:
 @Preview
 @Composable
 fun BottomTabBar(modifier: Modifier = Modifier, navController: NavHostController = rememberNavController()){
-    BottomAppBar{
+    BottomAppBar(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
+    ){
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
         bottomTabs.forEach { item ->
@@ -394,7 +398,7 @@ fun BottomTabBar(modifier: Modifier = Modifier, navController: NavHostController
                         restoreState = true
                     }
                 },
-                selectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                selectedContentColor = MaterialTheme.colorScheme.onPrimary,
                 unselectedContentColor = Color.Gray,
             )
         }
