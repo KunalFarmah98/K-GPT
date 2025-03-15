@@ -11,5 +11,6 @@ data class Message(
     val id: String = UUID.randomUUID().toString(),
     val time: Long = Date().time,
     val isUser: Boolean = true,
-    val text: String = ""
+    val text: String = "",
+    val citations: List<String> = listOf()
 )

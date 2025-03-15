@@ -55,7 +55,11 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -84,7 +88,8 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    ConstraintLayout(modifier= modifier.padding(bottom = 2.dp)
+    ConstraintLayout(modifier= modifier
+        .padding(bottom = 2.dp)
         .fillMaxWidth()
         ) {
         val (textField, sendButton) = createRefs()
@@ -130,7 +135,9 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping
                 containerColor = MaterialTheme.colorScheme.primary
             )
         ) {
-            Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.primary), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "send",

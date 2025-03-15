@@ -33,15 +33,6 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
             )
         )
 
-//        viewModelScope.launch {
-//            _isLoading.value = true
-//            _messages.value = _messages.value + Message(isUser = true, text = request)
-//            delay(2000)
-//            _isLoading.value = false
-//            _messages.value = _messages.value + Message(isUser = false, text = "Hello there")
-//        }
-
-
         viewModelScope.launch {
             _isLoading.value = true
             _messages.value = _messages.value + Message(isUser = true, text = request)
@@ -49,7 +40,12 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
             var message = if(response.choices.isEmpty()){
                 Message(isUser = false, text = "Something went wrong")
             } else{
-                Message(isUser = false, text = response.choices[0].message.content.trim())
+                val messageResponse = response.choices[0].message
+                Message(
+                    isUser = false,
+                    text = messageResponse.content.trim(),
+                    citations = messageResponse.annotations
+                )
             }
             _isLoading.value = false
             _messages.value = _messages.value + message
