@@ -7,6 +7,7 @@ import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIRequest
 import com.apps.kunalfarmah.k_gpt.repository.OpenAIRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -56,16 +57,17 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
         }
     }
 
-    suspend fun getAllMessages(platform: String){
-        _messages.value = networkRepository.getAllMessages(platform)
+    fun getAllMessages(){
+        viewModelScope.launch(Dispatchers.IO) {
+            _messages.value = networkRepository.getAllMessages("OpenAI")
+        }
     }
 
-    suspend fun deleteAllMessages(platform: String){
-        networkRepository.deleteAllMessages(platform)
-    }
-
-    suspend fun deleteMessages(){
-        networkRepository.deleteAllMessages()
+    fun deleteAllMessages(){
+        viewModelScope.launch(Dispatchers.IO) {
+            networkRepository.deleteAllMessages("OpenAI")
+            _messages.value = listOf()
+        }
     }
 
 }

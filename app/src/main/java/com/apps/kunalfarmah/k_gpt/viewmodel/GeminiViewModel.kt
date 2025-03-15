@@ -7,6 +7,7 @@ import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiRequest
 import com.apps.kunalfarmah.k_gpt.repository.GeminiRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -58,17 +59,17 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
         }
     }
 
-    suspend fun getAllMessages(platform: String){
-        _messages.value = networkRepository.getAllMessages(platform)
+    fun getAllMessages(){
+        viewModelScope.launch(Dispatchers.IO) {
+            _messages.value = networkRepository.getAllMessages("Gemini")
+        }
     }
 
-    suspend fun deleteAllMessages(platform: String){
-        networkRepository.deleteAllMessages(platform)
+    fun deleteAllMessages(){
+        viewModelScope.launch(Dispatchers.IO) {
+            networkRepository.deleteAllMessages("Gemini")
+            _messages.value = listOf()
+        }
     }
-
-    suspend fun deleteMessages(){
-        networkRepository.deleteAllMessages()
-    }
-
 
 }
