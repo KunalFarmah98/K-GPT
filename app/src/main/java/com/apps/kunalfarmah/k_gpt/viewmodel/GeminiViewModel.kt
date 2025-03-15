@@ -36,21 +36,39 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
         )
 
         viewModelScope.launch {
+            val userMessage = Message(isUser = true, text = request, platform = "Gemini")
             _isLoading.value = true
-            _messages.value = _messages.value + Message(isUser = true, text = request)
+            _messages.value = _messages.value + userMessage
             val response = networkRepository.generateContent(modelName, geminiRequest)
             var message = if(response.candidates.isEmpty()){
-                Message(isUser = false, text = "Something went wrong")
+                Message(isUser = false, text = "Something went wrong", platform = "Gemini")
             } else{
                 val messageResponse = response.candidates[0]
                 Message(
                     isUser = false,
                     text = messageResponse.content.parts[0].text.trim(),
-                    citations = messageResponse.citationMetadata.citationSources.map { it.uri })
+                    citations = messageResponse.citationMetadata.citationSources.map { it.uri },
+                    platform = "Gemini"
+                )
             }
             _isLoading.value = false
             _messages.value = _messages.value + message
+            networkRepository.insertMessage(userMessage)
+            networkRepository.insertMessage(message)
         }
     }
+
+    suspend fun getAllMessages(platform: String){
+        _messages.value = networkRepository.getAllMessages(platform)
+    }
+
+    suspend fun deleteAllMessages(platform: String){
+        networkRepository.deleteAllMessages(platform)
+    }
+
+    suspend fun deleteMessages(){
+        networkRepository.deleteAllMessages()
+    }
+
 
 }

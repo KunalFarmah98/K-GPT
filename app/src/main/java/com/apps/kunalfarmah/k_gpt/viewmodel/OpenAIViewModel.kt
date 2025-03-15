@@ -34,22 +34,38 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
         )
 
         viewModelScope.launch {
+            val userMessage = Message(isUser = true, text = request, platform = "OpenAI")
             _isLoading.value = true
-            _messages.value = _messages.value + Message(isUser = true, text = request)
+            _messages.value = _messages.value + userMessage
             val response = networkRepository.generateContent(openAIRequest)
             var message = if(response.choices.isEmpty()){
-                Message(isUser = false, text = "Something went wrong")
+                Message(isUser = false, text = "Something went wrong", platform = "OpenAI")
             } else{
                 val messageResponse = response.choices[0].message
                 Message(
                     isUser = false,
                     text = messageResponse.content.trim(),
-                    citations = messageResponse.annotations
+                    citations = messageResponse.annotations,
+                    platform = "OpenAI"
                 )
             }
             _isLoading.value = false
             _messages.value = _messages.value + message
+            networkRepository.insertMessage(userMessage)
+            networkRepository.insertMessage(message)
         }
+    }
+
+    suspend fun getAllMessages(platform: String){
+        _messages.value = networkRepository.getAllMessages(platform)
+    }
+
+    suspend fun deleteAllMessages(platform: String){
+        networkRepository.deleteAllMessages(platform)
+    }
+
+    suspend fun deleteMessages(){
+        networkRepository.deleteAllMessages()
     }
 
 }

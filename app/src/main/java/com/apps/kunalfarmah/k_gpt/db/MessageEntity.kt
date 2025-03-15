@@ -1,17 +1,16 @@
-package com.apps.kunalfarmah.k_gpt.data
+package com.apps.kunalfarmah.k_gpt.db
 
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.util.Date
 import java.util.UUID
 
-@Stable
-@Immutable
-data class Message(
+@Entity(tableName = "messages")
+data class MessageEntity(
+    @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
     val time: Long = Date().time,
     val isUser: Boolean = true,
     val text: String = "",
-    val citations: List<String> = listOf(),
     val platform: String = ""
 )

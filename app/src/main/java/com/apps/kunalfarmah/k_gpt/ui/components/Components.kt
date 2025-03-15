@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,10 +13,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,10 +22,12 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -55,11 +56,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -74,6 +72,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.apps.kunalfarmah.k_gpt.Constants
+import com.apps.kunalfarmah.k_gpt.R
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.ui.screens.bottomTabs
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
@@ -281,7 +280,10 @@ fun ModelSpinner(modifier: Modifier = Modifier, type: String = "Gemini", onModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun AppBar(title: String = "Gemini") {
+fun AppBar(title: String = "Gemini", onClear: (String?) -> Unit = {}, onHistory: () -> Unit = {}) {
+    var expanded by rememberSaveable {
+        mutableStateOf(false)
+    }
     TopAppBar(
         title = {
             Text(title)
@@ -289,7 +291,48 @@ fun AppBar(title: String = "Gemini") {
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.onPrimary
-        )
+        ),
+        actions = {
+            IconButton(onClick = onHistory) {
+                Image(
+                    painter = painterResource(id = R.drawable.baseline_history_24),
+                    contentDescription = "history"
+                )
+            }
+            IconButton(onClick = { expanded = true }) {
+                Icon(modifier = Modifier.size (24.dp), tint = Color.White, imageVector = Icons.Outlined.Settings, contentDescription = "settings")
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Clear Gemini History") },
+                    onClick = {
+                        expanded = false
+                        onClear("Gemini")
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text("Clear OpenAI History") },
+                    onClick = {
+                        expanded = false
+                        onClear("OpenAI")
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Clear All Message History") },
+                    onClick = {
+                        expanded = false
+                        onClear(null)
+                    }
+                )
+            }
+        }
     )
 }
 
