@@ -53,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
@@ -317,11 +318,12 @@ fun AppBar(title: String = "Gemini", onClear: (String?) -> Unit = {}, onHistory:
             IconButton(onClick = onHistory) {
                 Image(
                     painter = painterResource(id = R.drawable.baseline_history_24),
-                    contentDescription = "history"
+                    contentDescription = "history",
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
                 )
             }
             IconButton(onClick = { expanded = true }) {
-                Icon(modifier = Modifier.size (24.dp), tint = Color.White, imageVector = Icons.Outlined.Settings, contentDescription = "settings")
+                Icon(modifier = Modifier.size (24.dp), tint = MaterialTheme.colorScheme.onPrimary, imageVector = Icons.Outlined.Settings, contentDescription = "settings")
             }
 
             DropdownMenu(
