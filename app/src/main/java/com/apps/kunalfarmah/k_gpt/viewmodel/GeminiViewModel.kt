@@ -6,6 +6,7 @@ import com.apps.kunalfarmah.k_gpt.GeminiModels
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiRequest
 import com.apps.kunalfarmah.k_gpt.repository.GeminiRepository
+import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,7 +46,14 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
         )
 
         viewModelScope.launch {
-            val userMessage = Message(isUser = true, text = request, platform = "Gemini")
+            val userMessage = Message(
+                isUser = true,
+                text = request,
+                platform = "Gemini",
+                firstMessageInDay = (_messages.value.isEmpty() || getDate(_messages.value.last().time) != getDate(
+                    Date().time
+                ))
+            )
             _isLoading.value = true
             _messages.value = _messages.value + userMessage
             val response = networkRepository.generateContent(modelName, geminiRequest)

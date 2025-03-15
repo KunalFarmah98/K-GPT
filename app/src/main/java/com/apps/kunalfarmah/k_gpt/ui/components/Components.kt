@@ -76,6 +76,7 @@ import com.apps.kunalfarmah.k_gpt.R
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.ui.screens.bottomTabs
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
+import com.apps.kunalfarmah.k_gpt.util.Util.getTime
 import kotlin.math.roundToInt
 
 @Preview
@@ -170,13 +171,16 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
         boxModifier  = boxModifier.width(100.dp)
     }
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = if (isUser) Alignment.End else Alignment.Start) {
+        if(message.firstMessageInDay){
+            Text(modifier = Modifier.fillMaxWidth().padding(5.dp), color = MaterialTheme.colorScheme.onSurface, text = getDate(message.time), fontSize = 12.sp, textAlign = TextAlign.Center)
+        }
         Box(
             modifier = boxModifier.widthIn(min = 50.dp, max = (screenWidth*0.8f).toInt().dp)
         ) {
             Text(modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, text = message.text, color = MaterialTheme.colorScheme.onPrimary)
         }
         if(!isThinking){
-            Text(modifier = Modifier.padding(top = 2.dp, end = if(isUser) 10.dp else 0.dp, start = if(isUser) 0.dp else 10.dp), textAlign = TextAlign.Center, text = getDate(message.time), fontSize = 10.sp)
+            Text(modifier = Modifier.padding(top = 2.dp, end = if(isUser) 10.dp else 0.dp, start = if(isUser) 0.dp else 10.dp), textAlign = TextAlign.Center, text = getTime(message.time), fontSize = 10.sp)
         }
     }
 }

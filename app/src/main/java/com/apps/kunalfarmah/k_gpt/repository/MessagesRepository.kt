@@ -3,18 +3,20 @@ package com.apps.kunalfarmah.k_gpt.repository
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.db.MessageDAO
 import com.apps.kunalfarmah.k_gpt.db.MessageEntity
+import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 import javax.inject.Inject
 
 open class MessagesRepository @Inject constructor(private val messageDAO: MessageDAO) {
 
-    suspend fun getAllMessages(platform: String): List<Message>{
-        return messageDAO.getAllMessages(platform).map {
+    suspend fun getAllMessages(platform: String): List<Message> {
+        return messageDAO.getAllMessages(platform).mapIndexed { index, messageEntity ->
             Message(
-                id = it.id,
-                time = it.time,
-                isUser = it.isUser,
-                text = it.text,
-                platform = it.platform
+                id = messageEntity.id,
+                time = messageEntity.time,
+                isUser = messageEntity.isUser,
+                text = messageEntity.text,
+                platform = messageEntity.platform,
+                firstMessageInDay = (index == 0 || (getDate(messageEntity.time) != getDate(messageDAO.getAllMessages(platform)[index - 1].time)))
             )
         }
     }

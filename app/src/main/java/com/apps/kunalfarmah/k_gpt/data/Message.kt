@@ -13,5 +13,6 @@ data class Message(
     val isUser: Boolean = true,
     val text: String = "",
     val citations: List<String> = listOf(),
-    val platform: String = ""
+    val platform: String = "",
+    val firstMessageInDay: Boolean = false
 )
