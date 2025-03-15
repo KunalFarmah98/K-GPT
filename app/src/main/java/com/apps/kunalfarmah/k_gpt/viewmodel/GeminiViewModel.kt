@@ -9,7 +9,9 @@ import com.apps.kunalfarmah.k_gpt.repository.GeminiRepository
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -23,6 +25,9 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
 
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading.asStateFlow()
+
+    private val _alerts = MutableSharedFlow<String>()
+    val alerts = _alerts.asSharedFlow()
 
     init {
         //clear all older messages than 1 week
@@ -78,6 +83,9 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
     fun getAllMessages(){
         viewModelScope.launch(Dispatchers.IO) {
             _messages.value = networkRepository.getAllMessages("Gemini")
+            if(_messages.value.isEmpty()){
+                _alerts.emit("No Gemini History Found")
+            }
         }
     }
 

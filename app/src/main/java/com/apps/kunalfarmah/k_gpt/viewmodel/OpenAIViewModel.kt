@@ -9,7 +9,9 @@ import com.apps.kunalfarmah.k_gpt.repository.OpenAIRepository
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -23,6 +25,9 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
 
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading.asStateFlow()
+
+    private val _alerts = MutableSharedFlow<String>()
+    val alerts = _alerts.asSharedFlow()
 
     fun generateRequest(model: String = OpenAIModels.GPT_4O_MINI.modelName, request: String) {
 
@@ -69,6 +74,9 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
     fun getAllMessages(){
         viewModelScope.launch(Dispatchers.IO) {
             _messages.value = networkRepository.getAllMessages("OpenAI")
+            if(_messages.value.isEmpty()){
+                _alerts.emit("No OpenAI History Found")
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package com.apps.kunalfarmah.k_gpt
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -8,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.apps.kunalfarmah.k_gpt.navigation.AppNavigator
@@ -28,6 +30,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             KGPTTheme {
                 val navController = rememberNavController()
+                LaunchedEffect(true) {
+                    geminiViewModel.alerts.collect {
+                        Toast.makeText(this@MainActivity, it, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                LaunchedEffect(true) {
+                    openAIViewModel.alerts.collect {
+                        Toast.makeText(this@MainActivity, it, Toast.LENGTH_SHORT).show()
+                    }
+                }
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     topBar = {
                         AppBar(title = resources.getString(R.string.app_name), onClear = {
