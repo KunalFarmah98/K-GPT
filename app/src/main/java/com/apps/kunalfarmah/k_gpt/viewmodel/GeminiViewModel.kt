@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +22,13 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
 
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading.asStateFlow()
+
+    init {
+        //clear all older messages than 1 week
+        viewModelScope.launch(Dispatchers.IO) {
+            networkRepository.deleteOlderMessages(Date().time.minus(7 * 24 * 60 * 60 * 1000))
+        }
+    }
 
     fun generateRequest(model: String = GeminiModels.GEMINI_2_0_FLASH.name, request: String) {
         val modelName = "$model:generateContent"
