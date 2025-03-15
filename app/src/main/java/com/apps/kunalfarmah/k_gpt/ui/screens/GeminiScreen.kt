@@ -55,7 +55,6 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
     Column(
         modifier = modifier
             .fillMaxSize()
-            .imePadding()
     ) {
         ModelSpinner(type = "Gemini", onModelSelected = {model = it})
         LazyColumn(

@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                         Toast.makeText(this@MainActivity, it, Toast.LENGTH_SHORT).show()
                     }
                 }
-                Scaffold(modifier = Modifier.fillMaxSize(),
+                Scaffold(
                     topBar = {
                         AppBar(title = resources.getString(R.string.app_name), onClear = {
                             it.let{

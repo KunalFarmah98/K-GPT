@@ -54,7 +54,6 @@ fun OpenAIScreen(modifier: Modifier = Modifier, viewModel: OpenAIViewModel = hil
     Column(
         modifier = modifier
             .fillMaxSize()
-            .imePadding()
     ) {
         ModelSpinner(type = "OpenAI", onModelSelected = {model = it})
         LazyColumn(

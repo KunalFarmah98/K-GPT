@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -57,6 +59,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -103,6 +107,19 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping
                 }
                 .padding(8.dp),
             placeholder = { Text("Enter your message") },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Send,
+                autoCorrectEnabled = false,
+                capitalization = KeyboardCapitalization.None
+            ),
+            keyboardActions = KeyboardActions(
+                onSend = {
+                    onSend(text)
+                    text = ""
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                }
+            ),
             value = text,
             shape = RoundedCornerShape(16.dp),
             onValueChange = {
