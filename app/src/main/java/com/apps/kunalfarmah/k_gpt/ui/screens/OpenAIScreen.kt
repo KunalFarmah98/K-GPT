@@ -1,7 +1,6 @@
 package com.apps.kunalfarmah.k_gpt.ui.screens
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -52,8 +51,7 @@ fun OpenAIScreen(modifier: Modifier = Modifier, viewModel: OpenAIViewModel = hil
     }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
+        modifier = modifier.imePadding()
     ) {
         ModelSpinner(type = "OpenAI", onModelSelected = {model = it})
         LazyColumn(
