@@ -16,7 +16,8 @@ open class MessagesRepository @Inject constructor(private val messageDAO: Messag
                 isUser = messageEntity.isUser,
                 text = messageEntity.text,
                 platform = messageEntity.platform,
-                firstMessageInDay = (index == 0 || (getDate(messageEntity.time) != getDate(messageDAO.getAllMessages(platform)[index - 1].time)))
+                firstMessageInDay = (index == 0 || (getDate(messageEntity.time) != getDate(messageDAO.getAllMessages(platform)[index - 1].time))),
+                fromHistory = true
             )
         }
     }

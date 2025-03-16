@@ -253,9 +253,11 @@ fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateTe
             startIndex = boldEnd + 2
         }
     }
-    Text(text = annotatedString, modifier = Modifier.padding(10.dp).onSizeChanged{
-        onHeightChanged(it.height)
-    }, textAlign = TextAlign.Start, color = color)
+    Text(text = annotatedString, modifier = Modifier
+        .padding(10.dp)
+        .onSizeChanged {
+            onHeightChanged(it.height)
+        }, textAlign = TextAlign.Start, color = color)
 }
 
 @Preview
@@ -292,19 +294,25 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
         Box(
             modifier = boxModifier.widthIn(min = 50.dp, max = (screenWidth*0.8f).toInt().dp)
         ) {
+            // do not animate user messages or messages from history
             if (message.isUser) {
                 Text(text = message.text, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onPrimary)
-            } else {
+            }
+            else if(message.fromHistory){
+                StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)
+            }
+            else {
                 AnimatedStyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary, animateText, onAnimated = {
-                    animateText = false
-                },
-                    onHeightChanged = {newHeight ->
+                        animateText = false
+                    },
+                    onHeightChanged = { newHeight ->
                         if (newHeight > lastHeight) {
                             Log.d("TAG", "ChatBubble: $newHeight - $lastHeight")
                             val offset = newHeight - lastHeight
-                            val index = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                            val index =
+                                listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
                             lastHeight = newHeight
-                            if(offset > 20){
+                            if (offset > 20) {
                                 if (index >= listState.firstVisibleItemIndex) {
                                     Log.d("TAG", "ChatBubble: $offset")
                                     val scrollBy = offset
@@ -315,7 +323,8 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
                                 }
                             }
                         }
-                    })
+                    }
+                )
             }
         }
         if(!isThinking){
