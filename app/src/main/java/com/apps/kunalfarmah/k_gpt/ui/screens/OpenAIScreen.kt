@@ -64,7 +64,8 @@ fun OpenAIScreen(modifier: Modifier = Modifier, viewModel: OpenAIViewModel = hil
 
             items(items = messages.value, key = {it.id}) {
                 ChatBubble(
-                    message = it
+                    message = it,
+                    listState = listState
                 )
             }
             item{

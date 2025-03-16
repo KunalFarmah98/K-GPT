@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -48,9 +50,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -60,6 +64,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -94,6 +99,7 @@ import com.apps.kunalfarmah.k_gpt.ui.screens.bottomTabs
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 import com.apps.kunalfarmah.k_gpt.util.Util.getTime
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Preview
@@ -208,7 +214,8 @@ fun StyledText(text: String, color: Color = Color.Unspecified) {
 
 
 @Composable
-fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateText: Boolean = true, onAnimated: () -> Unit = {}) {
+fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateText: Boolean = true, onAnimated: () -> Unit = {},
+                       onHeightChanged: (Int) -> Unit = {}) {
     val words = text.split(" ")
     val animatedWords = remember { mutableStateListOf<String>() }
     LaunchedEffect(Unit) {
@@ -245,13 +252,16 @@ fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateTe
             startIndex = boldEnd + 2
         }
     }
-    Text(text = annotatedString, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = color)
+    Text(text = annotatedString, modifier = Modifier.padding(10.dp).onSizeChanged{
+        onHeightChanged(it.height)
+    }, textAlign = TextAlign.Start, color = color)
 }
 
 @Preview
 @Composable
-fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = "Hello"), isThinking: Boolean = false){
+fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = "Hello"), isThinking: Boolean = false, listState: LazyListState = rememberLazyListState()){
     val isUser = message.isUser
+    val coroutineScope = rememberCoroutineScope()
     val bubbleShape = RoundedCornerShape(
         topStart = 16.dp,
         topEnd = 16.dp,
@@ -271,6 +281,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
     if(isThinking){
         boxModifier  = boxModifier.width(100.dp)
     }
+    var lastHeight by remember { mutableIntStateOf(0) }
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = if (isUser) Alignment.End else Alignment.Start) {
         if(message.firstMessageInDay){
             Text(modifier = Modifier
@@ -285,7 +296,23 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             } else {
                 AnimatedStyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary, animateText, onAnimated = {
                     animateText = false
-                })
+                },
+                    onHeightChanged = {newHeight ->
+                        if (newHeight > lastHeight) {
+                            val offset = newHeight - lastHeight
+                            val index = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                            lastHeight = newHeight
+                            if(offset > 20){
+                                if (index >= listState.firstVisibleItemIndex) {
+                                    val scrollBy = offset
+                                    val current = listState.firstVisibleItemScrollOffset
+                                    coroutineScope.launch {
+                                        listState.scrollToItem(index, current - scrollBy)
+                                    }
+                                }
+                            }
+                        }
+                    })
             }
         }
         if(!isThinking){

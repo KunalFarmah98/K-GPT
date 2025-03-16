@@ -64,7 +64,8 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
 
             items(items = messages.value, key = {it.id}) {
                 ChatBubble(
-                    message = it
+                    message = it,
+                    listState = listState
                 )
             }
             item{
