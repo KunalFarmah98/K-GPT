@@ -232,7 +232,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             modifier = boxModifier.widthIn(min = 50.dp, max = (screenWidth*0.8f).toInt().dp)
         ) {
             if (message.isUser) {
-                StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)
+                Text(text = message.text, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onPrimary)
             } else {
                 StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)
             }
