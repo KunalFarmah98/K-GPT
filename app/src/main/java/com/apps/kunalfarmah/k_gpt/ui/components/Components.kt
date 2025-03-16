@@ -46,7 +46,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -91,6 +93,7 @@ import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.ui.screens.bottomTabs
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 import com.apps.kunalfarmah.k_gpt.util.Util.getTime
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Preview
@@ -203,6 +206,48 @@ fun StyledText(text: String, color: Color = Color.Unspecified) {
     Text(text = annotatedString, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = color)
 }
 
+
+@Composable
+fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateText: Boolean = true, onAnimated: () -> Unit = {}) {
+    val words = text.split(" ")
+    val animatedWords = remember { mutableStateListOf<String>() }
+    LaunchedEffect(Unit) {
+        if(animateText) {
+            words.forEach { word ->
+                animatedWords.add(word)
+                delay(50) // Delay between each word
+            }
+            onAnimated()
+        }
+        else{
+            animatedWords.clear()
+            animatedWords.addAll(words)
+        }
+    }
+    val annotatedString = buildAnnotatedString {
+        var startIndex = 0
+        val annotatedText = animatedWords.joinToString(" ")
+        while (startIndex < annotatedText.length) {
+            val boldStart = annotatedText.indexOf("**", startIndex)
+            if (boldStart == -1) {
+                append(annotatedText.substring(startIndex))
+                break
+            }
+            val boldEnd = annotatedText.indexOf("**", boldStart + 2)
+            if (boldEnd == -1) {
+                append(annotatedText.substring(startIndex))
+                break
+            }
+            append(annotatedText.substring(startIndex, boldStart))
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(annotatedText.substring(boldStart + 2, boldEnd))
+            }
+            startIndex = boldEnd + 2
+        }
+    }
+    Text(text = annotatedString, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = color)
+}
+
 @Preview
 @Composable
 fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = "Hello"), isThinking: Boolean = false){
@@ -215,6 +260,10 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
     )
     val backgroundColor = if (isUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
     val screenWidth = LocalConfiguration.current.screenWidthDp
+
+    var animateText by rememberSaveable {
+        mutableStateOf(true)
+    }
 
     var boxModifier = modifier
         .clip(bubbleShape)
@@ -234,7 +283,9 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             if (message.isUser) {
                 Text(text = message.text, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onPrimary)
             } else {
-                StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)
+                AnimatedStyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary, animateText, onAnimated = {
+                    animateText = false
+                })
             }
         }
         if(!isThinking){
