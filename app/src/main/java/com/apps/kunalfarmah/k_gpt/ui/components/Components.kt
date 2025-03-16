@@ -1,5 +1,6 @@
 package com.apps.kunalfarmah.k_gpt.ui.components
 
+import android.util.Log
 import android.view.ViewTreeObserver
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -222,7 +223,7 @@ fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateTe
         if(animateText) {
             words.forEach { word ->
                 animatedWords.add(word)
-                delay(50) // Delay between each word
+                delay(100) // Delay between each word
             }
             onAnimated()
         }
@@ -299,11 +300,13 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
                 },
                     onHeightChanged = {newHeight ->
                         if (newHeight > lastHeight) {
+                            Log.d("TAG", "ChatBubble: $newHeight - $lastHeight")
                             val offset = newHeight - lastHeight
                             val index = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
                             lastHeight = newHeight
                             if(offset > 20){
                                 if (index >= listState.firstVisibleItemIndex) {
+                                    Log.d("TAG", "ChatBubble: $offset")
                                     val scrollBy = offset
                                     val current = listState.firstVisibleItemScrollOffset
                                     coroutineScope.launch {

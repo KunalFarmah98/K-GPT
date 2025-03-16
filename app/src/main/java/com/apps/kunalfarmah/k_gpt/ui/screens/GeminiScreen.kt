@@ -26,7 +26,6 @@ import com.apps.kunalfarmah.k_gpt.ui.components.Input
 import com.apps.kunalfarmah.k_gpt.ui.components.ModelSpinner
 import com.apps.kunalfarmah.k_gpt.ui.components.ThinkingBubble
 import com.apps.kunalfarmah.k_gpt.viewmodel.GeminiViewModel
-import kotlinx.coroutines.launch
 
 @Preview
 @Composable
@@ -44,9 +43,7 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
 
     LaunchedEffect(messages.value.size) {
         if(messages.value.isNotEmpty()){
-            coroutineScope.launch {
-                listState.animateScrollToItem(messages.value.size - 1)
-            }
+            listState.animateScrollToItem(messages.value.size - 1)
         }
     }
 
