@@ -16,7 +16,6 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
-import kotlin.time.Duration
 
 @InstallIn(SingletonComponent::class)
 @Module

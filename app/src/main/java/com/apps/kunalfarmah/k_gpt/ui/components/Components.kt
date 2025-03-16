@@ -63,9 +63,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -174,6 +178,31 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping
     }
 }
 
+@Composable
+fun StyledText(text: String, color: Color = Color.Unspecified) {
+    val annotatedString = buildAnnotatedString {
+        var startIndex = 0
+        while (startIndex < text.length) {
+            val boldStart = text.indexOf("**", startIndex)
+            if (boldStart == -1) {
+                append(text.substring(startIndex))
+                break
+            }
+            val boldEnd = text.indexOf("**", boldStart + 2)
+            if (boldEnd == -1) {
+                append(text.substring(startIndex))
+                break
+            }
+            append(text.substring(startIndex, boldStart))
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(text.substring(boldStart + 2, boldEnd))
+            }
+            startIndex = boldEnd + 2
+        }
+    }
+    Text(text = annotatedString, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = color)
+}
+
 @Preview
 @Composable
 fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = "Hello"), isThinking: Boolean = false){
@@ -195,12 +224,18 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
     }
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = if (isUser) Alignment.End else Alignment.Start) {
         if(message.firstMessageInDay){
-            Text(modifier = Modifier.fillMaxWidth().padding(5.dp), color = MaterialTheme.colorScheme.onSurface, text = getDate(message.time), fontSize = 12.sp, textAlign = TextAlign.Center)
+            Text(modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp), color = MaterialTheme.colorScheme.onSurface, text = getDate(message.time), fontSize = 12.sp, textAlign = TextAlign.Center)
         }
         Box(
             modifier = boxModifier.widthIn(min = 50.dp, max = (screenWidth*0.8f).toInt().dp)
         ) {
-            Text(modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, text = message.text, color = MaterialTheme.colorScheme.onPrimary)
+            if (message.isUser) {
+                StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)
+            } else {
+                StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)
+            }
         }
         if(!isThinking){
             Text(modifier = Modifier.padding(top = 2.dp, end = if(isUser) 10.dp else 0.dp, start = if(isUser) 0.dp else 10.dp), textAlign = TextAlign.Center, text = getTime(message.time), fontSize = 10.sp)
