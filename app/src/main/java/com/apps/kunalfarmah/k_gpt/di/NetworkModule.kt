@@ -10,10 +10,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
+import kotlin.time.Duration
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -30,26 +33,33 @@ object NetworkModule {
     @Named("open_ai_base_url")
     fun provideOpenAIBaseUrl(): String = OPEN_AI_BASE_URL
 
+    @Singleton
+    @Provides
+    fun provideOkHttpClient() = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(30,
+        TimeUnit.SECONDS).build()
+
 
     @Singleton
     @Provides
     @Named("gemini_retrofit")
-    fun provideGeminiRetrofit(@Named("gemini_base_url") baseUrl: String): Retrofit {
+    fun provideGeminiRetrofit(@Named("gemini_base_url") baseUrl: String, okHttpClient: OkHttpClient): Retrofit {
         val networkJson = Json { ignoreUnknownKeys = true }
         return Retrofit.Builder()
             .baseUrl(baseUrl)
-            .addConverterFactory(networkJson.asConverterFactory("application/json".toMediaType())) // should add it at last
+            .client(okHttpClient)
+            .addConverterFactory(networkJson.asConverterFactory("application/json".toMediaType()))
             .build()
     }
 
     @Singleton
     @Provides
     @Named("open_ai_retrofit")
-    fun provideOpenAIRetrofit(@Named("open_ai_base_url") baseUrl: String): Retrofit {
+    fun provideOpenAIRetrofit(@Named("open_ai_base_url") baseUrl: String, okHttpClient: OkHttpClient): Retrofit {
         val networkJson = Json { ignoreUnknownKeys = true }
         return Retrofit.Builder()
             .baseUrl(baseUrl)
-            .addConverterFactory(networkJson.asConverterFactory("application/json".toMediaType())) // should add it at last
+            .client(okHttpClient)
+            .addConverterFactory(networkJson.asConverterFactory("application/json".toMediaType()))
             .build()
     }
 
