@@ -1,5 +1,6 @@
 package com.apps.kunalfarmah.k_gpt.ui.components
 
+import android.view.ViewTreeObserver
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -44,6 +45,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +61,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -70,6 +73,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -362,6 +367,27 @@ fun AppBar(title: String = "Gemini", onClear: (String?) -> Unit = {}, onHistory:
 @Preview
 @Composable
 fun BottomTabBar(modifier: Modifier = Modifier, navController: NavHostController = rememberNavController()){
+    // Access the current View and keyboard visibility state
+    val view = LocalView.current
+    var isImeVisible by remember { mutableStateOf(false) }
+
+    // Observe keyboard visibility using ViewTreeObserver
+    DisposableEffect(Unit) {
+        val listener = ViewTreeObserver.OnPreDrawListener {
+            // Check if the IME (keyboard) is visible
+            isImeVisible = ViewCompat.getRootWindowInsets(view)
+                ?.isVisible(WindowInsetsCompat.Type.ime()) == true
+            true
+        }
+        view.viewTreeObserver.addOnPreDrawListener(listener)
+        onDispose {
+            view.viewTreeObserver.removeOnPreDrawListener(listener)
+        }
+    }
+    // hide bottom tabs when keyboard is open
+    if(isImeVisible) {
+        return
+    }
     BottomAppBar(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.primary,
