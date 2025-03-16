@@ -8,13 +8,18 @@ import javax.inject.Inject
 
 class GeminiRepository @Inject constructor(private val geminiApi: GeminiApi, messageDAO: MessageDAO) : MessagesRepository(messageDAO) {
     suspend fun generateContent(model: String, request: GeminiRequest): GeminiResponse {
-        val response = geminiApi.generateContent(model = model, body = request)
-        response.let {
-            return if(it.isSuccessful){
-                it.body() ?: GeminiResponse()
-            } else{
-                GeminiResponse()
+        return try {
+            val response = geminiApi.generateContent(model = model, body = request)
+            response.let {
+                if (it.isSuccessful) {
+                    it.body() ?: GeminiResponse()
+                } else {
+                    GeminiResponse()
+                }
             }
+        }
+        catch (_: Exception){
+            GeminiResponse()
         }
     }
 }
