@@ -373,7 +373,7 @@ fun BottomTabBar(modifier: Modifier = Modifier, navController: NavHostController
             BottomNavigationItem(
                 icon = {
                     androidx.compose.material.Icon(
-                        item.icon,
+                        painterResource(item.iconId),
                         contentDescription = item.name
                     )
                 },

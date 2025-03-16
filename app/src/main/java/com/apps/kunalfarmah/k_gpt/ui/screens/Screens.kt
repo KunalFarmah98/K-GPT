@@ -1,17 +1,14 @@
 package com.apps.kunalfarmah.k_gpt.ui.screens
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.ui.graphics.vector.ImageVector
+import com.apps.kunalfarmah.k_gpt.R
 import kotlinx.serialization.Serializable
 
 
-data class BottomTabs<T : Any>(val name: String, val route: T, val icon: ImageVector)
+data class BottomTabs<T : Any>(val name: String, val route: T, val iconId: Int)
 
 val bottomTabs = listOf(
-    BottomTabs("Gemini", Screens.GeminiChatScreen, Icons.Filled.Home),
-    BottomTabs("OpenAI", Screens.OpenAIChatScreen, Icons.Filled.Search),
+    BottomTabs("Gemini", Screens.GeminiChatScreen, R.drawable.ic_gemini),
+    BottomTabs("OpenAI", Screens.OpenAIChatScreen, R.drawable.ic_openai),
 )
 
 sealed class Screens{
