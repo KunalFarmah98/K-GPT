@@ -275,7 +275,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
     val screenWidth = LocalConfiguration.current.screenWidthDp
 
     var animateText by rememberSaveable {
-        mutableStateOf(true)
+        mutableStateOf(!message.fromHistory)
     }
 
     var boxModifier = modifier
