@@ -6,6 +6,8 @@ import java.util.Date
 
 object Util {
 
+    val animatedMessages = mutableSetOf<String>()
+
     @SuppressLint("SimpleDateFormat")
     fun getTime(date: Long): String{
         val sdf = SimpleDateFormat("HH:mm")

@@ -40,9 +40,6 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
     var model by rememberSaveable {
         mutableStateOf(GeminiModels.GEMINI_2_0_FLASH.modelName)
     }
-    var isTyping by remember{
-        mutableStateOf(false)
-    }
 
     // Access the current View and keyboard visibility state
     val view = LocalView.current
@@ -92,7 +89,7 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
                 }
             }
         }
-        Input(onTyping = {isTyping = true}, onSubmit = {isTyping = false}, onSend = {
+        Input(onSend = {
             if(it.isNotBlank()) {
                 viewModel.generateRequest(model = model, request = it)
             }

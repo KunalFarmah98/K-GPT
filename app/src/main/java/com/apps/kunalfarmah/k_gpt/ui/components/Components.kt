@@ -33,6 +33,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
@@ -97,6 +98,7 @@ import com.apps.kunalfarmah.k_gpt.Constants
 import com.apps.kunalfarmah.k_gpt.R
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.ui.screens.bottomTabs
+import com.apps.kunalfarmah.k_gpt.util.Util.animatedMessages
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 import com.apps.kunalfarmah.k_gpt.util.Util.getTime
 import kotlinx.coroutines.delay
@@ -105,7 +107,7 @@ import kotlin.math.roundToInt
 
 @Preview
 @Composable
-fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping: () -> Unit = {}, onSubmit: () -> Unit = {}){
+fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}){
     var text by rememberSaveable {
         mutableStateOf("")
     }
@@ -143,7 +145,6 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping
             value = text,
             shape = RoundedCornerShape(16.dp),
             onValueChange = {
-                onTyping()
                 text = it
             },
             colors = TextFieldDefaults.colors(
@@ -165,7 +166,6 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping
                     text = ""
                     focusManager.clearFocus()
                     keyboardController?.hide()
-                    onSubmit()
                 },
             shape = CircleShape,
             colors = CardDefaults.cardColors(
@@ -174,17 +174,19 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, onTyping
         ) {
             Column(modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.primary), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                .background(MaterialTheme.colorScheme.primary),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "send",
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
                         .size(25.dp)
                 )
             }
-
         }
-
     }
 }
 
@@ -275,7 +277,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
     val screenWidth = LocalConfiguration.current.screenWidthDp
 
     var animateText by rememberSaveable {
-        mutableStateOf(!message.fromHistory)
+        mutableStateOf(!animatedMessages.contains(message.id))
     }
 
     var boxModifier = modifier
@@ -302,7 +304,12 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
                 StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)
             }
             else {
-                AnimatedStyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary, animateText, onAnimated = {
+                AnimatedStyledText(
+                    text = message.text,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    animateText,
+                    onAnimated = {
+                        animatedMessages.add(message.id)
                         animateText = false
                     },
                     onHeightChanged = { newHeight ->

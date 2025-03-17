@@ -38,9 +38,6 @@ fun OpenAIScreen(modifier: Modifier = Modifier, viewModel: OpenAIViewModel = hil
     var model by rememberSaveable {
         mutableStateOf(OpenAIModels.GPT_4O_MINI.modelName)
     }
-    var isTyping by remember{
-        mutableStateOf(false)
-    }
 
     LaunchedEffect(messages.value.size) {
         if(messages.value.isNotEmpty()){
@@ -74,7 +71,7 @@ fun OpenAIScreen(modifier: Modifier = Modifier, viewModel: OpenAIViewModel = hil
                 }
             }
         }
-        Input(onTyping = { isTyping = true }, onSubmit = { isTyping = false }, onSend = {
+        Input(onSend = {
             if (it.isNotBlank()) {
                 viewModel.generateRequest(model = model, request = it)
             }
