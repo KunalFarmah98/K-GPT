@@ -1,5 +1,6 @@
 package com.apps.kunalfarmah.k_gpt.ui.screens
 
+import android.util.Log
 import android.view.ViewTreeObserver
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -60,8 +61,11 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
     }
 
     LaunchedEffect(messages.value.size, isImeVisible) {
+        if(isImeVisible){
+            listState.scrollToItem(messages.value.size - 1)
+        }
         if(messages.value.isNotEmpty()){
-            listState.animateScrollToItem(messages.value.size - 1, 100)
+            listState.animateScrollToItem(messages.value.size - 1)
         }
     }
 
