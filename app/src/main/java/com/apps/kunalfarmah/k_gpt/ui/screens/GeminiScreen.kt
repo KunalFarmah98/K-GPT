@@ -61,7 +61,7 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
     }
 
     LaunchedEffect(messages.value.size, isImeVisible) {
-        if(isImeVisible){
+        if(isImeVisible && messages.value.isNotEmpty()){
             listState.scrollToItem(messages.value.size - 1)
         }
         if(messages.value.isNotEmpty()){
