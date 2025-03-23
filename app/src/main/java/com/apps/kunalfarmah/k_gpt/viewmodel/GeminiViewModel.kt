@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apps.kunalfarmah.k_gpt.GeminiModels
 import com.apps.kunalfarmah.k_gpt.data.Message
+import com.apps.kunalfarmah.k_gpt.network.model.Event
+import com.apps.kunalfarmah.k_gpt.network.model.Event.Toast
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiRequest
 import com.apps.kunalfarmah.k_gpt.repository.GeminiRepository
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
@@ -26,7 +28,7 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading.asStateFlow()
 
-    private val _alerts = MutableSharedFlow<String>()
+    private val _alerts = MutableSharedFlow<Event>()
     val alerts = _alerts.asSharedFlow()
 
     init {
@@ -84,7 +86,7 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
         viewModelScope.launch(Dispatchers.IO) {
             _messages.value = networkRepository.getAllMessages("Gemini")
             if(_messages.value.isEmpty()){
-                _alerts.emit("No Gemini History Found")
+                _alerts.emit(Toast("No Gemini History Found"))
             }
         }
     }
@@ -93,6 +95,12 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
         viewModelScope.launch(Dispatchers.IO) {
             networkRepository.deleteAllMessages("Gemini")
             _messages.value = listOf()
+        }
+    }
+
+    fun toggleMaxTokensDialog(show: Boolean){
+        viewModelScope.launch {
+            _alerts.emit(Event.MaxTokensDialog(show))
         }
     }
 

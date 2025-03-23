@@ -1,6 +1,7 @@
 package com.apps.kunalfarmah.k_gpt.util
 
 import android.annotation.SuppressLint
+import androidx.datastore.preferences.core.intPreferencesKey
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -26,4 +27,9 @@ object Util {
         }
     }
 
+}
+
+
+object SettingsKeys {
+    val MAX_TOKENS = intPreferencesKey("max_tokens")
 }

@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apps.kunalfarmah.k_gpt.OpenAIModels
 import com.apps.kunalfarmah.k_gpt.data.Message
+import com.apps.kunalfarmah.k_gpt.network.model.Event
+import com.apps.kunalfarmah.k_gpt.network.model.Event.Toast
 import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIRequest
 import com.apps.kunalfarmah.k_gpt.repository.OpenAIRepository
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
@@ -26,7 +28,7 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading.asStateFlow()
 
-    private val _alerts = MutableSharedFlow<String>()
+    private val _alerts = MutableSharedFlow<Event>()
     val alerts = _alerts.asSharedFlow()
 
     fun generateRequest(model: String = OpenAIModels.GPT_4O_MINI.modelName, request: String) {
@@ -75,7 +77,7 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
         viewModelScope.launch(Dispatchers.IO) {
             _messages.value = networkRepository.getAllMessages("OpenAI")
             if(_messages.value.isEmpty()){
-                _alerts.emit("No OpenAI History Found")
+                _alerts.emit(Toast("No OpenAI History Found"))
             }
         }
     }
@@ -84,6 +86,12 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
         viewModelScope.launch(Dispatchers.IO) {
             networkRepository.deleteAllMessages("OpenAI")
             _messages.value = listOf()
+        }
+    }
+
+    fun toggleMaxTokensDialog(show: Boolean){
+        viewModelScope.launch {
+            _alerts.emit(Event.MaxTokensDialog(show))
         }
     }
 
