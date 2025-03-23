@@ -1,6 +1,5 @@
 package com.apps.kunalfarmah.k_gpt.ui.screens
 
-import android.util.Log
 import android.view.ViewTreeObserver
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,6 +40,9 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
     var model by rememberSaveable {
         mutableStateOf(GeminiModels.GEMINI_2_0_FLASH.modelName)
     }
+    var isResponding by remember{
+        mutableStateOf(false)
+    }
 
     // Access the current View and keyboard visibility state
     val view = LocalView.current
@@ -60,11 +62,11 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
         }
     }
 
-    LaunchedEffect(messages.value.size, isImeVisible) {
+    LaunchedEffect(messages.value.size, isImeVisible, isResponding) {
         if(isImeVisible && messages.value.isNotEmpty()){
             listState.scrollToItem(messages.value.size - 1)
         }
-        if(messages.value.isNotEmpty()){
+        else if(messages.value.isNotEmpty()){
             listState.animateScrollToItem(messages.value.size - 1)
         }
     }
@@ -84,7 +86,11 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
             items(items = messages.value, key = {it.id}) {
                 ChatBubble(
                     message = it,
-                    listState = listState
+                    listState = listState,
+                    isResponding = isResponding,
+                    onResponseCompleted = {
+                        isResponding = false
+                    }
                 )
             }
             item{
@@ -93,10 +99,16 @@ fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hil
                 }
             }
         }
-        Input(onSend = {
-            if(it.isNotBlank()) {
-                viewModel.generateRequest(model = model, request = it)
-            }
-        })
+        Input(
+            onSend = {
+                if (it.isNotBlank()) {
+                    viewModel.generateRequest(model = model, request = it)
+                    isResponding = true
+                }
+            },
+            isResponding = !isLoading && isResponding,
+            onResponseStopped = {
+                isResponding = false
+            })
     }
 }

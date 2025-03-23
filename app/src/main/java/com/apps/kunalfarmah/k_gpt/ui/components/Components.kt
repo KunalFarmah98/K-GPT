@@ -107,7 +107,7 @@ import kotlin.math.roundToInt
 
 @Preview
 @Composable
-fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}){
+fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}){
     var text by rememberSaveable {
         mutableStateOf("")
     }
@@ -162,10 +162,15 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}){
                 .padding(end = 8.dp, bottom = 8.dp)
                 .size(55.dp)
                 .clickable {
-                    onSend(text)
-                    text = ""
-                    focusManager.clearFocus()
-                    keyboardController?.hide()
+                    if(isResponding){
+                        onResponseStopped()
+                    }
+                    else {
+                        onSend(text)
+                        text = ""
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                    }
                 },
             shape = CircleShape,
             colors = CardDefaults.cardColors(
@@ -178,13 +183,22 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}){
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "send",
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier
-                        .size(25.dp)
-                )
+                if(isResponding){
+                    Image(
+                        painter = painterResource(id = R.drawable.baseline_stop_24),
+                        contentDescription = "stop",
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+                    )
+                }
+                else {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = "send",
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier
+                            .size(25.dp)
+                    )
+                }
             }
         }
     }
@@ -218,12 +232,26 @@ fun StyledText(text: String, color: Color = Color.Unspecified) {
 
 @Composable
 fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateText: Boolean = true, onAnimated: () -> Unit = {},
-                       onHeightChanged: (Int) -> Unit = {}) {
+                       onHeightChanged: (Int) -> Unit = {}, isResponding: Boolean) {
     val words = text.split(" ")
     val animatedWords = remember { mutableStateListOf<String>() }
-    LaunchedEffect(Unit) {
-        if(animateText) {
-            words.forEach { word ->
+    var showAnimation by remember {
+        mutableStateOf(isResponding)
+    }
+    // Update showAnimation whenever isResponding changes
+    LaunchedEffect(isResponding) {
+        showAnimation = isResponding
+    }
+
+    LaunchedEffect(showAnimation) {
+        if(!showAnimation){
+            onAnimated()
+        }
+        if(animateText && showAnimation) {
+            for (word in words) {
+                if (!showAnimation) {
+                    break
+                }
                 animatedWords.add(word)
                 delay(100) // Delay between each word
             }
@@ -264,7 +292,7 @@ fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateTe
 
 @Preview
 @Composable
-fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = "Hello"), isThinking: Boolean = false, listState: LazyListState = rememberLazyListState()){
+fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = "Hello"), isThinking: Boolean = false, listState: LazyListState = rememberLazyListState(), isResponding: Boolean=false, onResponseCompleted: () -> Unit = {}){
     val isUser = message.isUser
     val coroutineScope = rememberCoroutineScope()
     val bubbleShape = RoundedCornerShape(
@@ -307,10 +335,12 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
                 AnimatedStyledText(
                     text = message.text,
                     color = MaterialTheme.colorScheme.onPrimary,
-                    animateText,
+                    animateText = animateText,
+                    isResponding = isResponding,
                     onAnimated = {
                         animatedMessages.add(message.id)
                         animateText = false
+                        onResponseCompleted()
                     },
                     onHeightChanged = { newHeight ->
                         if (newHeight > lastHeight) {
