@@ -1,11 +1,10 @@
-package com.apps.kunalfarmah.k_gpt.viewmodel
+package com.apps.kunalfarmah.k_gpt.viewmodel.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.network.model.Event
-import com.apps.kunalfarmah.k_gpt.network.model.Event.Toast
-import com.apps.kunalfarmah.k_gpt.repository.MessagesRepository
+import com.apps.kunalfarmah.k_gpt.repository.base.MessagesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +34,7 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
         viewModelScope.launch(Dispatchers.IO) {
             _messages.value = messagesRepository.getAllMessages(platform)
             if(_messages.value.isEmpty()){
-                _alerts.emit(Toast("No $platform History Found"))
+                _alerts.emit(Event.Toast("No $platform History Found"))
             }
         }
     }

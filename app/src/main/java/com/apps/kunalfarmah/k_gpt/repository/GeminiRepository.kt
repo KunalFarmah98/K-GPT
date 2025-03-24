@@ -1,9 +1,10 @@
 package com.apps.kunalfarmah.k_gpt.repository
 
 import com.apps.kunalfarmah.k_gpt.db.MessageDAO
+import com.apps.kunalfarmah.k_gpt.network.api.GeminiApi
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiRequest
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiResponse
-import com.apps.kunalfarmah.k_gpt.network.api.GeminiApi
+import com.apps.kunalfarmah.k_gpt.repository.base.MessagesRepository
 import javax.inject.Inject
 
 class GeminiRepository @Inject constructor(private val geminiApi: GeminiApi, messageDAO: MessageDAO) : MessagesRepository(messageDAO) {

@@ -1,9 +1,9 @@
-package com.apps.kunalfarmah.k_gpt.repository
+package com.apps.kunalfarmah.k_gpt.repository.base
 
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.db.MessageDAO
 import com.apps.kunalfarmah.k_gpt.db.MessageEntity
-import com.apps.kunalfarmah.k_gpt.util.Util.getDate
+import com.apps.kunalfarmah.k_gpt.util.Util
 import javax.inject.Inject
 
 open class MessagesRepository @Inject constructor(private val messageDAO: MessageDAO) {
@@ -16,20 +16,24 @@ open class MessagesRepository @Inject constructor(private val messageDAO: Messag
                 isUser = messageEntity.isUser,
                 text = messageEntity.text,
                 platform = messageEntity.platform,
-                firstMessageInDay = (index == 0 || (getDate(messageEntity.time) != getDate(messageDAO.getAllMessages(platform)[index - 1].time))),
+                firstMessageInDay = (index == 0 || (Util.getDate(messageEntity.time) != Util.getDate(
+                    messageDAO.getAllMessages(platform)[index - 1].time
+                ))),
                 fromHistory = true
             )
         }
     }
 
     suspend fun insertMessage(message: Message){
-        messageDAO.insertMessage(MessageEntity(
-            id = message.id,
-            time = message.time,
-            isUser = message.isUser,
-            text = message.text,
-            platform = message.platform
-        ))
+        messageDAO.insertMessage(
+            MessageEntity(
+                id = message.id,
+                time = message.time,
+                isUser = message.isUser,
+                text = message.text,
+                platform = message.platform
+            )
+        )
     }
 
     suspend fun deleteOlderMessages(currTime: Long){

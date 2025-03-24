@@ -5,6 +5,7 @@ import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIRequest
 import com.apps.kunalfarmah.k_gpt.repository.OpenAIRepository
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
+import com.apps.kunalfarmah.k_gpt.viewmodel.base.ChatViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.Date

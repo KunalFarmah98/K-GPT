@@ -37,7 +37,7 @@ import com.apps.kunalfarmah.k_gpt.ui.components.Input
 import com.apps.kunalfarmah.k_gpt.ui.components.MaxTokensDialog
 import com.apps.kunalfarmah.k_gpt.ui.components.ModelSpinner
 import com.apps.kunalfarmah.k_gpt.ui.components.ThinkingBubble
-import com.apps.kunalfarmah.k_gpt.viewmodel.ChatViewModel
+import com.apps.kunalfarmah.k_gpt.viewmodel.base.ChatViewModel
 import kotlinx.coroutines.launch
 
 @Composable

@@ -23,7 +23,7 @@ import com.apps.kunalfarmah.k_gpt.ui.components.AppBar
 import com.apps.kunalfarmah.k_gpt.ui.components.BottomTabBar
 import com.apps.kunalfarmah.k_gpt.ui.theme.KGPTTheme
 import com.apps.kunalfarmah.k_gpt.util.SettingsKeys
-import com.apps.kunalfarmah.k_gpt.viewmodel.ChatViewModel
+import com.apps.kunalfarmah.k_gpt.viewmodel.base.ChatViewModel
 import com.apps.kunalfarmah.k_gpt.viewmodel.GeminiViewModel
 import com.apps.kunalfarmah.k_gpt.viewmodel.OpenAIViewModel
 import dagger.hilt.android.AndroidEntryPoint
