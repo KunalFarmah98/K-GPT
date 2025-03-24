@@ -19,8 +19,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -73,6 +75,10 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         mutableStateOf("")
     }
 
+    var previousContentSize by remember { mutableStateOf(IntSize(0,0)) }
+    var currentContentSize by remember { mutableStateOf(IntSize(0,0)) }
+
+
     val context = LocalContext.current
     val datastore = context.dataStore
 
@@ -124,9 +130,10 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         }
     }
 
-    LaunchedEffect(messages.value.size, isImeVisible, isResponding) {
-        if(isImeVisible && messages.value.isNotEmpty()){
+    LaunchedEffect(messages.value.size, isImeVisible, isResponding, currentContentSize) {
+        if(messages.value.isNotEmpty() && (isImeVisible || currentContentSize.height > previousContentSize.height)){
             listState.scrollToItem(messages.value.size - 1)
+            previousContentSize = currentContentSize
         }
         else if(messages.value.isNotEmpty()){
             listState.animateScrollToItem(messages.value.size - 1)
@@ -141,7 +148,10 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(1f)
+                .onSizeChanged {
+                    currentContentSize = it
+                },
             state = listState
         ) {
 
