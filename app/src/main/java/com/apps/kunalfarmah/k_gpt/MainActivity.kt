@@ -23,6 +23,7 @@ import com.apps.kunalfarmah.k_gpt.ui.components.AppBar
 import com.apps.kunalfarmah.k_gpt.ui.components.BottomTabBar
 import com.apps.kunalfarmah.k_gpt.ui.theme.KGPTTheme
 import com.apps.kunalfarmah.k_gpt.util.SettingsKeys
+import com.apps.kunalfarmah.k_gpt.viewmodel.ChatViewModel
 import com.apps.kunalfarmah.k_gpt.viewmodel.GeminiViewModel
 import com.apps.kunalfarmah.k_gpt.viewmodel.OpenAIViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,20 +63,20 @@ class MainActivity : ComponentActivity() {
                         AppBar(title = resources.getString(R.string.app_name), onClear = {
                             it.let{
                                 if(it == null){
-                                    geminiViewModel.deleteAllMessages()
-                                    openAIViewModel.deleteAllMessages()
+                                    geminiViewModel.deleteAllMessages(it)
+                                    openAIViewModel.deleteAllMessages(it)
                                 }
                                 if(it=="Gemini"){
-                                    geminiViewModel.deleteAllMessages()
+                                    geminiViewModel.deleteAllMessages(it)
                                 }
                                 else{
-                                    openAIViewModel.deleteAllMessages()
+                                    openAIViewModel.deleteAllMessages(it)
                                 }
                             }
                         },
                             onHistory = {
-                                openAIViewModel.getAllMessages()
-                                geminiViewModel.getAllMessages()
+                                openAIViewModel.getAllMessages("OpenAI")
+                                geminiViewModel.getAllMessages("Gemini")
                             }
                         )
                     },

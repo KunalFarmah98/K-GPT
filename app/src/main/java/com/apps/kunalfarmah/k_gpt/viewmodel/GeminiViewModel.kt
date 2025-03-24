@@ -1,44 +1,18 @@
 package com.apps.kunalfarmah.k_gpt.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.apps.kunalfarmah.k_gpt.GeminiModels
 import com.apps.kunalfarmah.k_gpt.data.Message
-import com.apps.kunalfarmah.k_gpt.network.model.Event
-import com.apps.kunalfarmah.k_gpt.network.model.Event.Toast
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiRequest
 import com.apps.kunalfarmah.k_gpt.repository.GeminiRepository
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
-class GeminiViewModel @Inject constructor(private val networkRepository: GeminiRepository): ViewModel() {
-
-    private val _messages = MutableStateFlow<List<Message>>(listOf())
-    val messages = _messages.asStateFlow()
-
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    val isLoading = _isLoading.asStateFlow()
-
-    private val _alerts = MutableSharedFlow<Event>()
-    val alerts = _alerts.asSharedFlow()
-
-    init {
-        //clear all older messages than 1 week
-        viewModelScope.launch(Dispatchers.IO) {
-            networkRepository.deleteOlderMessages(Date().time.minus(7 * 24 * 60 * 60 * 1000))
-        }
-    }
-
-    fun generateRequest(model: String = GeminiModels.GEMINI_2_0_FLASH.name, request: String) {
+class GeminiViewModel @Inject constructor(private val networkRepository: GeminiRepository): ChatViewModel(networkRepository) {
+    override fun generateRequest(model: String, request: String) {
         val modelName = "$model:generateContent"
         val geminiRequest = GeminiRequest(
             contents = listOf(
@@ -51,7 +25,6 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
                 )
             )
         )
-
         viewModelScope.launch {
             val userMessage = Message(
                 isUser = true,
@@ -81,27 +54,4 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
             networkRepository.insertMessage(message)
         }
     }
-
-    fun getAllMessages(){
-        viewModelScope.launch(Dispatchers.IO) {
-            _messages.value = networkRepository.getAllMessages("Gemini")
-            if(_messages.value.isEmpty()){
-                _alerts.emit(Toast("No Gemini History Found"))
-            }
-        }
-    }
-
-    fun deleteAllMessages(){
-        viewModelScope.launch(Dispatchers.IO) {
-            networkRepository.deleteAllMessages("Gemini")
-            _messages.value = listOf()
-        }
-    }
-
-    fun toggleMaxTokensDialog(show: Boolean){
-        viewModelScope.launch {
-            _alerts.emit(Event.MaxTokensDialog(show))
-        }
-    }
-
 }

@@ -36,12 +36,15 @@ open class MessagesRepository @Inject constructor(private val messageDAO: Messag
         messageDAO.deleteOlderMessages(currTime)
     }
 
-    suspend fun deleteAllMessages(){
-        messageDAO.deleteAllMessages()
-    }
-
-    suspend fun deleteAllMessages(platform: String){
-        messageDAO.deleteAllMessages(platform)
+    suspend fun deleteAllMessages(platform: String?){
+        platform.let {
+            if(it != null){
+                messageDAO.deleteAllMessages(it)
+            }
+            else{
+                messageDAO.deleteAllMessages()
+            }
+        }
     }
 
 }
