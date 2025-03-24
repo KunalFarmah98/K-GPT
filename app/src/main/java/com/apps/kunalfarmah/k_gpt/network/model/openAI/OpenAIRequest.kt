@@ -11,7 +11,9 @@ data class OpenAIRequest(
     @SerialName("model")
     val model: String = "",
     @SerialName("store")
-    val store: Boolean = false
+    val store: Boolean = false,
+    @SerialName("max_tokens")
+    val max_tokens: Int? = null
 ) {
     @Serializable
     data class Message(

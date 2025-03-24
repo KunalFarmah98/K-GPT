@@ -73,7 +73,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
@@ -96,6 +95,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -105,6 +105,7 @@ import androidx.navigation.compose.rememberNavController
 import com.apps.kunalfarmah.k_gpt.Constants
 import com.apps.kunalfarmah.k_gpt.R
 import com.apps.kunalfarmah.k_gpt.data.Message
+import com.apps.kunalfarmah.k_gpt.ui.screens.Screens
 import com.apps.kunalfarmah.k_gpt.ui.screens.bottomTabs
 import com.apps.kunalfarmah.k_gpt.util.Util.animatedMessages
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
@@ -476,7 +477,7 @@ fun ModelSpinner(modifier: Modifier = Modifier, type: String = "Gemini", onModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun AppBar(title: String = "Gemini", onClear: (String?) -> Unit = {}, onHistory: () -> Unit = {}) {
+fun AppBar(title: String = "Gemini", backStackEntry: NavBackStackEntry? = rememberNavController().currentBackStackEntry, onClear: (String?) -> Unit = {}, onHistory: () -> Unit = {}, onTokenSettings: () -> Unit = {}) {
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
@@ -528,6 +529,15 @@ fun AppBar(title: String = "Gemini", onClear: (String?) -> Unit = {}, onHistory:
                         onClear(null)
                     }
                 )
+                if(backStackEntry?.destination?.hasRoute<Screens.OpenAIChatScreen>() == true) {
+                    DropdownMenuItem(
+                        text = { Text("Set Max Response Tokens") },
+                        onClick = {
+                            expanded = false
+                            onTokenSettings()
+                        }
+                    )
+                }
             }
         }
     )
@@ -608,11 +618,19 @@ fun BottomTabBar(modifier: Modifier = Modifier, navController: NavHostController
 fun MaxTokensDialog(
     showDialog: Boolean = true,
     onDismiss: () -> Unit = {},
-    maxTokens: Int = 0,
-    onSave: (Int) -> Unit = {}
+    maxTokens: Int ?= null,
+    onSave: (Int?) -> Unit = {}
 ) {
     if (showDialog) {
-        var maxTokens by remember { mutableStateOf("$maxTokens") }
+        var maxTokens by remember {
+            maxTokens.let {
+                if (it == null || it == 0) {
+                    mutableStateOf("")
+                } else {
+                    mutableStateOf(it.toString())
+                }
+            }
+        }
         Dialog(onDismissRequest = onDismiss) {
             Card(
                 shape = RoundedCornerShape(10.dp),
@@ -622,12 +640,17 @@ fun MaxTokensDialog(
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(16.dp),
+                        .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Set Max Tokens",
-                        style = MaterialTheme.typography.headlineSmall
+                        text = "Set Max Response Tokens",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                    Text(
+                        text = "(leave blank for no limit)",
+                        style = MaterialTheme.typography.bodySmall
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
@@ -649,8 +672,13 @@ fun MaxTokensDialog(
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(onClick = {
-                            val tokens = maxTokens.toIntOrNull() ?: 0
-                            onSave(tokens)
+                            maxTokens.let {
+                                if (it.isEmpty()) {
+                                    onSave(null)
+                                } else {
+                                    onSave(it.toInt())
+                                }
+                            }
                         }) {
                             Text("Save")
                         }

@@ -1,6 +1,7 @@
 package com.apps.kunalfarmah.k_gpt.ui.screens
 
 import android.view.ViewTreeObserver
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -12,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -66,20 +66,44 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
     }
 
     var maxTokens by remember {
-        mutableIntStateOf(Int.MAX_VALUE)
+        mutableStateOf<Int?>(null)
     }
 
+    var limitExceededError by remember {
+        mutableStateOf("")
+    }
 
     val context = LocalContext.current
     val datastore = context.dataStore
 
     LaunchedEffect(true) {
+        launch{
+            datastore.getMaxTokens().let{
+                maxTokens = if(it == null || it == 0){
+                    null
+                } else{
+                    it
+                }
+            }
+        }
         viewModel.alerts.collect {
             if(it is Event.MaxTokensDialog){
                 showDialog = it.show
             }
+            if(it is Event.Toast){
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+            }
+            if(it is Event.LimitExceeded){
+                limitExceededError = it.message
+            }
         }
-        maxTokens = datastore.getMaxTokens()
+    }
+
+    LaunchedEffect(isResponding) {
+        if(!isResponding && limitExceededError.isNotEmpty()){
+            Toast.makeText(context, limitExceededError, Toast.LENGTH_SHORT).show()
+            limitExceededError = ""
+        }
     }
 
     // Access the current View and keyboard visibility state
@@ -140,7 +164,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         Input(
             onSend = {
                 if (it.isNotBlank()) {
-                    viewModel.generateRequest(model = model, request = it)
+                    viewModel.generateRequest(model = model, request = it, maxTokens = maxTokens)
                     isResponding = true
                 }
             },
@@ -157,8 +181,9 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         onSave = {
             maxTokens = it
             scope.launch {
-                datastore.setMaxTokens(it)
+                datastore.setMaxTokens(it ?: 0)
             }
+            viewModel.toggleMaxTokensDialog(false)
         }
     )
 

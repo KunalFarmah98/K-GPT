@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GeminiViewModel @Inject constructor(private val networkRepository: GeminiRepository): ChatViewModel(networkRepository) {
-    override fun generateRequest(model: String, request: String) {
+    override fun generateRequest(model: String, request: String, maxTokens: Int?) {
         val modelName = "$model:generateContent"
         val geminiRequest = GeminiRequest(
             contents = listOf(

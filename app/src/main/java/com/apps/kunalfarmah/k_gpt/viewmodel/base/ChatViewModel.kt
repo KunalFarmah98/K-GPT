@@ -20,7 +20,7 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
     internal val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading.asStateFlow()
 
-    private val _alerts = MutableSharedFlow<Event>()
+    internal val _alerts = MutableSharedFlow<Event>()
     val alerts = _alerts.asSharedFlow()
 
     init {
@@ -52,5 +52,5 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
         }
     }
 
-    abstract fun generateRequest(model: String, request: String)
+    abstract fun generateRequest(model: String, request: String, maxTokens: Int? = null)
 }
