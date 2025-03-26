@@ -55,7 +55,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                 OpenAIModels.GPT_4O_MINI.modelName
             }
             else{
-                GeminiModels.GEMINI_2_0_FLASH.modelName
+                GeminiModels.GEMINI_2_5_PRO.modelName
             }
         })
     }

@@ -333,7 +333,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             modifier = boxModifier.widthIn(min = 50.dp, max = (screenWidth*0.8f).toInt().dp)
         ) {
             // do not animate user messages or messages from history
-            if (message.isUser) {
+            if (message.isUser || isThinking) {
                 Text(text = message.text, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onPrimary)
             }
             else if(message.fromHistory){
@@ -440,7 +440,7 @@ fun ModelSpinner(modifier: Modifier = Modifier, type: String = "Gemini", onModel
                     .clip(RectangleShape)
                     .border(width = 1.dp, color = MaterialTheme.colorScheme.primary)
                     .padding(2.dp)
-                    .width(175.dp)
+                    .width(200.dp)
                     .clickable {
                         expanded = true
                     }
