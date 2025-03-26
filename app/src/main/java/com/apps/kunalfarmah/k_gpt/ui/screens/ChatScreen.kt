@@ -13,12 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -78,6 +80,10 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
     var previousContentSize by remember { mutableStateOf(IntSize(0,0)) }
     var currentContentSize by remember { mutableStateOf(IntSize(0,0)) }
 
+    var chatBubbleSize by remember {
+        mutableIntStateOf(0)
+    }
+
 
     val context = LocalContext.current
     val datastore = context.dataStore
@@ -132,7 +138,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
 
     LaunchedEffect(messages.value.size, isImeVisible, isResponding, currentContentSize) {
         if(messages.value.isNotEmpty() && (isImeVisible || currentContentSize.height > previousContentSize.height)){
-            listState.scrollToItem(messages.value.size - 1)
+            listState.scrollToItem(messages.value.size - 1, chatBubbleSize)
             previousContentSize = currentContentSize
         }
         else if(messages.value.isNotEmpty()){
@@ -157,6 +163,11 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
 
             items(items = messages.value, key = {it.id}) {
                 ChatBubble(
+                    modifier = Modifier.onGloballyPositioned { pos ->
+                      if(messages.value.last().id === it.id){
+                          chatBubbleSize = pos.size.height
+                      }
+                    },
                     message = it,
                     listState = listState,
                     isResponding = isResponding,
