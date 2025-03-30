@@ -137,7 +137,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
     }
 
     LaunchedEffect(messages.value.size, isImeVisible, isResponding, currentContentSize) {
-        if(messages.value.isNotEmpty() && (isImeVisible || currentContentSize.height > previousContentSize.height)){
+        if(messages.value.isNotEmpty() && ((isImeVisible || currentContentSize.height > previousContentSize.height) || !isResponding)){
             listState.scrollToItem(messages.value.size - 1, chatBubbleSize)
             previousContentSize = currentContentSize
         }
@@ -173,6 +173,9 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                     isResponding = isResponding,
                     onResponseCompleted = {
                         isResponding = false
+                        scope.launch {
+                            listState.animateScrollToItem(messages.value.size - 1, chatBubbleSize)
+                        }
                     }
                 )
             }
