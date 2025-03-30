@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">K-GPT</string>
+    <string name="copied_message_to_clipboard">Copied Message to clipboard</string>
 </resources>

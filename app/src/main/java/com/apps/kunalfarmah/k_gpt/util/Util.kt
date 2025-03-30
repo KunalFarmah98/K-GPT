@@ -1,6 +1,9 @@
 package com.apps.kunalfarmah.k_gpt.util
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.datastore.preferences.core.intPreferencesKey
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -25,6 +28,13 @@ object Util {
         } else{
             stringDate
         }
+    }
+
+    fun copyToClipboard(context: Context, text: String, label: String = "K-GPT Message Text") {
+        val clipboardManager =
+            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = ClipData.newPlainText(label, text)
+        clipboardManager.setPrimaryClip(clipData)
     }
 
 }

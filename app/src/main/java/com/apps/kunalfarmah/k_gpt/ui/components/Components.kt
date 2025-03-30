@@ -2,15 +2,20 @@ package com.apps.kunalfarmah.k_gpt.ui.components
 
 import android.util.Log
 import android.view.ViewTreeObserver
+import android.widget.Toast
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -70,9 +75,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
@@ -107,6 +114,7 @@ import com.apps.kunalfarmah.k_gpt.R
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.ui.screens.Screens
 import com.apps.kunalfarmah.k_gpt.ui.screens.bottomTabs
+import com.apps.kunalfarmah.k_gpt.util.Util
 import com.apps.kunalfarmah.k_gpt.util.Util.animatedMessages
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 import com.apps.kunalfarmah.k_gpt.util.Util.getTime
@@ -316,11 +324,31 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
         mutableStateOf(!animatedMessages.contains(message.id))
     }
 
+    val interactionSource = remember { MutableInteractionSource() }
+    val context = LocalContext.current
+
     var boxModifier = modifier
         .clip(bubbleShape)
         .background(backgroundColor)
-    if(isThinking){
-        boxModifier  = boxModifier.width(100.dp)
+        .widthIn(min = 50.dp, max = (screenWidth * 0.8f).toInt().dp)
+
+    if (isThinking) {
+        boxModifier = boxModifier.width(100.dp)
+    } else {
+        boxModifier =
+            boxModifier
+                .indication(interactionSource, LocalIndication.current)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            Util.copyToClipboard(context, message.text)
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.copied_message_to_clipboard),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        })
+                }
     }
     var lastHeight by remember { mutableIntStateOf(0) }
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = if (isUser) Alignment.End else Alignment.Start) {
@@ -330,7 +358,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
                 .padding(5.dp), color = MaterialTheme.colorScheme.onSurface, text = getDate(message.time), fontSize = 12.sp, textAlign = TextAlign.Center)
         }
         Box(
-            modifier = boxModifier.widthIn(min = 50.dp, max = (screenWidth*0.8f).toInt().dp)
+            modifier = boxModifier
         ) {
             // do not animate user messages or messages from history
             if (message.isUser || isThinking) {
