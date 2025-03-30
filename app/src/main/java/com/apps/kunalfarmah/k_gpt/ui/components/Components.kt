@@ -364,7 +364,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             if (message.isUser || isThinking) {
                 Text(text = message.text, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onPrimary)
             }
-            else if(message.fromHistory){
+            else if(message.fromHistory || !animateText){
                 StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)
             }
             else {
