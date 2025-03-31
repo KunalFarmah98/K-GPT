@@ -42,6 +42,7 @@ import com.apps.kunalfarmah.k_gpt.ui.components.MaxTokensDialog
 import com.apps.kunalfarmah.k_gpt.ui.components.ModelSpinner
 import com.apps.kunalfarmah.k_gpt.ui.components.ThinkingBubble
 import com.apps.kunalfarmah.k_gpt.viewmodel.base.ChatViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -137,7 +138,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
     }
 
     LaunchedEffect(messages.value.size, isImeVisible, isResponding, currentContentSize) {
-        if(messages.value.isNotEmpty() && !isResponding || (isImeVisible || currentContentSize.height > previousContentSize.height)){
+        if(messages.value.isNotEmpty() && (!isResponding || (isImeVisible || currentContentSize.height > previousContentSize.height))){
             listState.scrollToItem(messages.value.size - 1, chatBubbleSize)
             previousContentSize = currentContentSize
         }
@@ -193,6 +194,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
             onResponseStopped = {
                 isResponding = false
                 scope.launch {
+                    delay(100)
                     listState.scrollToItem(messages.value.size - 1, chatBubbleSize)
                 }
             })
