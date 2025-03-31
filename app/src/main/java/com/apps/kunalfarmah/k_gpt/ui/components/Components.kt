@@ -71,6 +71,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -124,7 +125,7 @@ import kotlin.math.roundToInt
 
 @Preview
 @Composable
-fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}){
+fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, isThinking: Boolean = false, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}){
     var text by rememberSaveable {
         mutableStateOf("")
     }
@@ -178,7 +179,11 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, isRespon
                 }
                 .padding(end = 8.dp, bottom = 8.dp)
                 .size(55.dp)
+                .alpha(if(isThinking) 0.5f else 1f)
                 .clickable {
+                    if(isThinking){
+                        return@clickable
+                    }
                     if (isResponding) {
                         onResponseStopped()
                     } else {

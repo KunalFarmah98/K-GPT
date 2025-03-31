@@ -191,6 +191,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                 }
             },
             isResponding = !isLoading && isResponding,
+            isThinking = isLoading,
             onResponseStopped = {
                 isResponding = false
                 scope.launch {
