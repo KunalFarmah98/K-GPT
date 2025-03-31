@@ -8,13 +8,12 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.indication
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +41,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.ripple
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -76,12 +76,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -311,6 +312,7 @@ fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateTe
         }, textAlign = TextAlign.Start, color = color)
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
 fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = "Hello"), isThinking: Boolean = false, listState: LazyListState = rememberLazyListState(), isResponding: Boolean=false, onResponseCompleted: () -> Unit = {}){
@@ -337,24 +339,25 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
         .background(backgroundColor)
         .widthIn(min = 50.dp, max = (screenWidth * 0.8f).toInt().dp)
 
-    if (isThinking) {
-        boxModifier = boxModifier.width(100.dp)
-    } else {
-        boxModifier =
-            boxModifier
-                .indication(interactionSource, LocalIndication.current)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = {
-                            Util.copyToClipboard(context, message.text)
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.copied_message_to_clipboard),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        })
-                }
+    val haptic = LocalHapticFeedback.current
+
+    boxModifier = if (isThinking) {
+        boxModifier.width(100.dp)
     }
+    else{
+        boxModifier.combinedClickable(
+            interactionSource = interactionSource,
+            indication = ripple(bounded = true),
+            onClick = {},
+            onLongClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                Util.copyToClipboard(context, message.text)
+                Toast.makeText(context, context.getString(R.string.copied_message_to_clipboard), Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+
     var lastHeight by remember { mutableIntStateOf(0) }
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = if (isUser) Alignment.End else Alignment.Start) {
         if(message.firstMessageInDay){
