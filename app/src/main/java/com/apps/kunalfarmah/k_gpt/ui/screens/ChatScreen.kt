@@ -38,6 +38,7 @@ import com.apps.kunalfarmah.k_gpt.network.model.Event
 import com.apps.kunalfarmah.k_gpt.setMaxTokens
 import com.apps.kunalfarmah.k_gpt.ui.components.ChatBubble
 import com.apps.kunalfarmah.k_gpt.ui.components.Input
+import com.apps.kunalfarmah.k_gpt.ui.components.KeepScreenOn
 import com.apps.kunalfarmah.k_gpt.ui.components.MaxTokensDialog
 import com.apps.kunalfarmah.k_gpt.ui.components.ModelSpinner
 import com.apps.kunalfarmah.k_gpt.ui.components.ThinkingBubble
@@ -145,6 +146,10 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         else if(messages.value.isNotEmpty()){
             listState.animateScrollToItem(messages.value.size - 1)
         }
+    }
+
+    if(isResponding){
+        KeepScreenOn()
     }
 
     Column(

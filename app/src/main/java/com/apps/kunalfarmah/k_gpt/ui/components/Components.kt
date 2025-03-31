@@ -1,7 +1,9 @@
 package com.apps.kunalfarmah.k_gpt.ui.components
 
+import android.app.Activity
 import android.util.Log
 import android.view.ViewTreeObserver
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -123,6 +125,20 @@ import com.apps.kunalfarmah.k_gpt.util.Util.getTime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+
+@Composable
+fun KeepScreenOn() {
+    val currentView = LocalView.current
+    val context = currentView.context
+    DisposableEffect(Unit) {
+        val window = (context as? Activity)?.window
+            ?: return@DisposableEffect onDispose {}
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        onDispose {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+}
 
 @Preview
 @Composable
