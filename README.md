@@ -14,46 +14,46 @@
 ### 4. Switch models with ease.
 ### 5. Smooth animated responses from the AI models.
 ### 6. Skip animations whenever required.
-### 7. Clean UI, adapting to the device's Material You Theme
+### 7. Clean UI, adapting to the device's Material You Theme.
 ### 8. Copy messages with a long tap.
-### 9. Clear platform, model or all message history.
+### 9. Clear platform wise or all message history.
 
 </br>
 
 # Screenshots
 
 <p vspace = "20" align="center" >
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_hello.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gpt_hello.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/thinking.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/responding.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_hello.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gpt_hello.jpg">
+   <img width="190" height="350" hspace="10"  src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/thinking.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/responding.jpg">
 </p>
 
 <br />
 
 <p vspace = "20" align="center" >
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/keyboard.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/big_response.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_chat.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gpt_4o.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/keyboard.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/big_response.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_chat.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gpt_4o.jpg">
 </p>
 
 <br />
 
 <p vspace = "20" align="center" >
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_models.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/openai_models.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/copy.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/big_response.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_models.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/openai_models.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/copy.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/big_response.jpg">
 </p>
 
 <br />
 
 <p vspace = "20" align="center" >
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/options_menu_gemini.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/options_menu_openai.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/max_tokens.jpg">&nbsp;&nbsp;&nbsp;
-   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/token_exceeded.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/options_menu_gemini.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/options_menu_openai.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/max_tokens.jpg">
+   <img width="190" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/token_exceeded.jpg">
 </p>
 
 
