@@ -1,8 +1,9 @@
 # K-GPT: The all in one AI chatbot
 
-### * Powered by both Gemini and OpenAI </ul>
-### * Get the features of both the AI models in one app
-### * No sign up, just dive in and use the most powerful models provided by both the Platforms
+### * Powered by both Gemini and OpenAI via Rest APIs.
+### * Get the features of both the AI platforms in one app.
+### * Choose the AI Model of your choice from the list and start chatting.
+### * No need to have separate apps, no sign up required, just dive in and use the most powerful models provided by both the Platforms.
 
 </br>
 
