@@ -1,6 +1,7 @@
 package com.apps.kunalfarmah.k_gpt.ui.components
 
 import android.app.Activity
+import android.os.Build
 import android.util.Log
 import android.view.ViewTreeObserver
 import android.view.WindowManager
@@ -196,9 +197,9 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, isThinki
                 }
                 .padding(end = 8.dp, bottom = 8.dp)
                 .size(55.dp)
-                .alpha(if(isThinking) 0.5f else 1f)
+                .alpha(if (isThinking) 0.5f else 1f)
                 .clickable {
-                    if(isThinking){
+                    if (isThinking) {
                         return@clickable
                     }
                     if (isResponding) {
@@ -368,7 +369,13 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             onLongClick = {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 Util.copyToClipboard(context, message.text)
-                Toast.makeText(context, context.getString(R.string.copied_message_to_clipboard), Toast.LENGTH_SHORT).show()
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.copied_message_to_clipboard),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         )
     }
