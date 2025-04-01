@@ -19,7 +19,42 @@
 
 </br>
 
-# Screen Grabs
+# Screenshots
+
+<p vspace = "20" align="center" >
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_hello.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gpt_hello.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/thinking.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/responding.jpg">
+</p>
+
+<br />
+
+<p vspace = "20" align="center" >
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/keyboard.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/big_response.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_chat.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gpt_4o.jpg">
+</p>
+
+<br />
+
+<p vspace = "20" align="center" >
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_models.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/openai_models.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/copy.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/big_response.jpg">
+</p>
+
+<br />
+
+<p vspace = "20" align="center" >
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/options_menu_gemini.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/options_menu_openai.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/max_tokens.jpg">&nbsp;&nbsp;&nbsp;
+   <img width="190" height="350" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/token_exceeded.jpg">
+</p>
+
 
 </br>
 
