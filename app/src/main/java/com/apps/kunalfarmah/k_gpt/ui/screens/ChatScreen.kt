@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -189,12 +190,28 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
             }
         }
         Input(
-            onSend = {
-                if (it.isNotBlank()) {
-                    viewModel.generateRequest(model = model, request = it, maxTokens = maxTokens)
+            onSend = {text ->
+                if (text.isNotBlank()) {
+                    model.let{ model->
+                        if(model == GeminiModels.GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION.modelName){
+                            viewModel.generateImage(model = model, request = text)
+                        }
+                        else{
+                            viewModel.generateRequest(model = model, request = text, maxTokens = maxTokens)
+                        }
+                    }
                     isResponding = true
                 }
             },
+            placeHolder =
+                model.let {
+                    if (it == GeminiModels.GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION.modelName) {
+                        "Enter your image prompt"
+                    } else {
+                        "Enter your message"
+                    }
+
+                },
             isResponding = !isLoading && isResponding,
             isThinking = isLoading,
             onResponseStopped = {

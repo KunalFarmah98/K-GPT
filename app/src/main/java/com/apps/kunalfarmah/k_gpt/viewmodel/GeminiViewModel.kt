@@ -2,6 +2,7 @@ package com.apps.kunalfarmah.k_gpt.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.apps.kunalfarmah.k_gpt.data.Message
+import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiImageGenerationRequest
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiRequest
 import com.apps.kunalfarmah.k_gpt.repository.GeminiRepository
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
@@ -55,4 +56,57 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
             networkRepository.insertMessage(message)
         }
     }
+
+    override fun generateImage(model: String, request: String, maxTokens: Int?) {
+        val modelName = "$model:generateContent"
+        val geminiImageRequest = GeminiImageGenerationRequest(
+            contents = listOf(
+                GeminiImageGenerationRequest.Content(
+                    parts = listOf(
+                        GeminiImageGenerationRequest.Content.Part(text = request)
+                    )
+                )
+            ),
+            generationConfig = GeminiImageGenerationRequest.GenerationConfig(
+                responseModalities = listOf("Text", "Image")
+            )
+        )
+
+        viewModelScope.launch {
+            val userMessage = Message(
+                isUser = true,
+                text = request,
+                platform = "Gemini",
+                firstMessageInDay = (_messages.value.isEmpty() || getDate(_messages.value.last().time) != getDate(
+                    Date().time
+                ))
+            )
+            _isLoading.value = true
+            _messages.value = _messages.value + userMessage
+            val response = networkRepository.generateImage(modelName, geminiImageRequest)
+            var message = if(response.candidates.isEmpty()){
+                Message(isUser = false, text = "Something went wrong", platform = "Gemini")
+            }
+            else{
+                if(!response.errorMessage.isNullOrEmpty()){
+                    Message(isUser = false, text = response.errorMessage, platform = "Gemini")
+                }
+                else {
+                    val messageResponse = response.candidates[0].content.parts[0]
+                    Message(
+                        isUser = false,
+                        platform = "Gemini",
+                        isImage = true,
+                        imageData = messageResponse.inlineData.data,
+                        mimeType = messageResponse.inlineData.mimeType
+                    )
+                }
+            }
+            _isLoading.value = false
+            _messages.value = _messages.value + message
+            networkRepository.insertMessage(userMessage)
+            networkRepository.insertMessage(message)
+        }
+    }
+
 }

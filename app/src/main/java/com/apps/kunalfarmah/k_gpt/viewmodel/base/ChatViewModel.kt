@@ -53,4 +53,6 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
     }
 
     abstract fun generateRequest(model: String, request: String, maxTokens: Int? = null)
+
+    abstract fun generateImage(model: String, request: String, maxTokens: Int? = null)
 }

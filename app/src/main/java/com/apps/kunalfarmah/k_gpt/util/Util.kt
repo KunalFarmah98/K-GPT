@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
 import androidx.datastore.preferences.core.intPreferencesKey
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -35,6 +38,17 @@ object Util {
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clipData = ClipData.newPlainText(label, text)
         clipboardManager.setPrimaryClip(clipData)
+    }
+
+    fun decodeImage(imageData: String, mimeType: String): Bitmap? {
+        return try {
+            val decodedBytes = Base64.decode(imageData, Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+        } catch (e: IllegalArgumentException) {
+            // Handle invalid Base64 string
+            e.printStackTrace()
+            null
+        }
     }
 
 }

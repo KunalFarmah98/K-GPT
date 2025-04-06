@@ -1,11 +1,14 @@
 package com.apps.kunalfarmah.k_gpt.ui.components
 
 import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
 import android.util.Log
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -79,7 +82,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
@@ -107,6 +112,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -115,6 +121,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.apps.kunalfarmah.k_gpt.Constants
+import com.apps.kunalfarmah.k_gpt.MainActivity
 import com.apps.kunalfarmah.k_gpt.R
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.ui.screens.Screens
@@ -143,7 +150,7 @@ fun KeepScreenOn() {
 
 @Preview
 @Composable
-fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, isThinking: Boolean = false, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}){
+fun Input(modifier: Modifier = Modifier, placeHolder: String = "", onSend: (String) -> Unit = {}, isThinking: Boolean = false, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}){
     var text by rememberSaveable {
         mutableStateOf("")
     }
@@ -164,7 +171,7 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, isThinki
                     width = Dimension.fillToConstraints
                 }
                 .padding(8.dp),
-            placeholder = { Text("Enter your message") },
+            placeholder = { Text(placeHolder) },
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Send,
                 autoCorrectEnabled = false,
@@ -329,6 +336,33 @@ fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateTe
         }, textAlign = TextAlign.Start, color = color)
 }
 
+@Composable
+fun DisplayImageWithDownload(imageData: String, mimeType: String, onDownloadClick: (bitmap: Bitmap) -> Unit = {}) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val bitmap = Util.decodeImage(imageData, mimeType)
+        if (bitmap != null) {
+            Box {
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = "Decoded Image",
+                    contentScale = ContentScale.Fit
+                )
+                IconButton(
+                    onClick = {onDownloadClick(bitmap)},
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                ) {
+                    Icon(modifier = Modifier.size(20.dp), painter = painterResource(R.drawable.baseline_download_24), contentDescription = "Download Image", tint = MaterialTheme.colorScheme.onSecondary)
+                }
+            }
+        } else {
+            // Handle the case where decoding fails (e.g., display an error message)
+            // For now, we'll just leave it empty.
+        }
+    }
+}
+
+
 @OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
@@ -361,6 +395,9 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
     boxModifier = if (isThinking) {
         boxModifier.width(100.dp)
     }
+    else if(message.isImage){
+        boxModifier.width(250.dp)
+    }
     else{
         boxModifier.combinedClickable(
             interactionSource = interactionSource,
@@ -382,6 +419,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
 
 
     var lastHeight by remember { mutableIntStateOf(0) }
+
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = if (isUser) Alignment.End else Alignment.Start) {
         if(message.firstMessageInDay){
             Text(modifier = Modifier
@@ -394,6 +432,27 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             // do not animate user messages or messages from history
             if (message.isUser || isThinking) {
                 Text(text = message.text, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onPrimary)
+            }
+            else if(message.isImage){
+                val fileName = "K-GPT_Image_${message.id}"
+                when (message.mimeType) {
+                    "image/jpeg" -> fileName.plus(".jpg")
+                    "image/png" -> fileName.plus(".png")
+                    else -> fileName.plus(".jpg")
+                }
+                DisplayImageWithDownload(imageData = message.imageData!!, mimeType = message.mimeType!!) { bitmap ->
+                    val launcher = (context as MainActivity).initializeSaveImageLauncher(
+                        context as ComponentActivity,
+                        bitmap,
+                        message.mimeType
+                    )
+                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = message.mimeType
+                        putExtra(Intent.EXTRA_TITLE, fileName)
+                    }
+                    launcher.launch(intent)
+                }
             }
             else if(message.fromHistory || !animateText){
                 StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)

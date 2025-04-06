@@ -19,6 +19,9 @@ open class MessagesRepository @Inject constructor(private val messageDAO: Messag
                 firstMessageInDay = (index == 0 || (Util.getDate(messageEntity.time) != Util.getDate(
                     messageDAO.getAllMessages(platform)[index - 1].time
                 ))),
+                isImage = messageEntity.isImage,
+                imageData = messageEntity.imageData,
+                mimeType = messageEntity.mimeType,
                 fromHistory = true
             )
         }
@@ -31,7 +34,10 @@ open class MessagesRepository @Inject constructor(private val messageDAO: Messag
                 time = message.time,
                 isUser = message.isUser,
                 text = message.text,
-                platform = message.platform
+                platform = message.platform,
+                isImage = message.isImage,
+                imageData = message.imageData,
+                mimeType = message.mimeType
             )
         )
     }

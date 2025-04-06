@@ -60,4 +60,12 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
             }
         }
     }
+
+    override fun generateImage(
+        model: String,
+        request: String,
+        maxTokens: Int?
+    ) {
+        TODO("Not yet implemented")
+    }
 }

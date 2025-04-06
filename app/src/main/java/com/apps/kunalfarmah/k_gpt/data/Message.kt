@@ -15,5 +15,8 @@ data class Message(
     val citations: List<String> = listOf(),
     val platform: String = "",
     val firstMessageInDay: Boolean = false,
-    val fromHistory: Boolean = false
+    val fromHistory: Boolean = false,
+    val isImage: Boolean = false,
+    val imageData: String? = "",
+    val mimeType: String ?= ""
 )
