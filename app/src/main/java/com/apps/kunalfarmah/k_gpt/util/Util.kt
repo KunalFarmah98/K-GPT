@@ -33,6 +33,11 @@ object Util {
         }
     }
 
+    fun getImageTime(date: Long): String{
+        val sdf = SimpleDateFormat("yyyyMMdd_HHmm")
+        return sdf.format(date)
+    }
+
     fun copyToClipboard(context: Context, text: String, label: String = "K-GPT Message Text") {
         val clipboardManager =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

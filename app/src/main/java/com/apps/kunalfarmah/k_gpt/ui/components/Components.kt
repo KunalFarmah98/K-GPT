@@ -101,6 +101,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -123,6 +124,7 @@ import androidx.navigation.compose.rememberNavController
 import com.apps.kunalfarmah.k_gpt.Constants
 import com.apps.kunalfarmah.k_gpt.MainActivity
 import com.apps.kunalfarmah.k_gpt.R
+import com.apps.kunalfarmah.k_gpt.data.ImageData
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.ui.screens.Screens
 import com.apps.kunalfarmah.k_gpt.ui.screens.bottomTabs
@@ -150,7 +152,7 @@ fun KeepScreenOn() {
 
 @Preview
 @Composable
-fun Input(modifier: Modifier = Modifier, placeHolder: String = "", onSend: (String) -> Unit = {}, isThinking: Boolean = false, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}){
+fun Input(modifier: Modifier = Modifier, placeHolder: String = "", onSend: (String) -> Unit = {}, isThinking: Boolean = false, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}, onGenerateImage: () -> Unit = {}){
     var text by rememberSaveable {
         mutableStateOf("")
     }
@@ -194,7 +196,14 @@ fun Input(modifier: Modifier = Modifier, placeHolder: String = "", onSend: (Stri
                 focusedIndicatorColor = Color.Transparent, // Hide the indicator line when focused
                 unfocusedIndicatorColor = Color.Transparent, // Hide the indicator line when not focused
                 disabledIndicatorColor = Color.Transparent // Hide the indicator line when disabled
-            )
+            ),
+            trailingIcon = {
+                Row{
+                    IconButton(onClick = onGenerateImage){
+                        Icon(painterResource(R.drawable.baseline_image_24), tint = MaterialTheme.colorScheme.primary, contentDescription = "image")
+                    }
+                }
+            }
         )
         Card(
             modifier
@@ -366,7 +375,7 @@ fun DisplayImageWithDownload(imageData: String, mimeType: String, onDownloadClic
 @OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
-fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = "Hello"), isThinking: Boolean = false, listState: LazyListState = rememberLazyListState(), isResponding: Boolean=false, onResponseCompleted: () -> Unit = {}){
+fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = "Hello"), isThinking: Boolean = false, listState: LazyListState = rememberLazyListState(), isResponding: Boolean=false, onResponseCompleted: () -> Unit = {}, onImageSelected: (ImageData) -> Unit = {}){
     val isUser = message.isUser
     val coroutineScope = rememberCoroutineScope()
     val bubbleShape = RoundedCornerShape(
@@ -391,12 +400,38 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
         .widthIn(min = 50.dp, max = (screenWidth * 0.8f).toInt().dp)
 
     val haptic = LocalHapticFeedback.current
-
+    var onDownloadClick: (bitmap: Bitmap) -> Unit = {}
+    var fileName = ""
     boxModifier = if (isThinking) {
         boxModifier.width(100.dp)
     }
     else if(message.isImage){
+        fileName = "K-GPT_Image_${Util.getImageTime(message.time)}".plus(
+            when (message.mimeType) {
+                "image/jpeg" -> ".jpg"
+                "image/png" -> ".png"
+                else -> ".jpg"
+            }
+        )
+        onDownloadClick =  { bitmap ->
+            onImageSelected(ImageData(bitmap = bitmap, mimeType = message.mimeType))
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = message.mimeType
+                putExtra(Intent.EXTRA_TITLE, fileName)
+            }
+            (context as MainActivity).saveImageLauncher.launch(intent)
+        }
         boxModifier.width(250.dp)
+            .combinedClickable(
+                interactionSource = interactionSource,
+                indication = ripple(bounded = true),
+                onClick = {},
+                onLongClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onDownloadClick(Util.decodeImage(message.imageData!!, message.mimeType ?: "image/png")!!)
+                }
+            )
     }
     else{
         boxModifier.combinedClickable(
@@ -434,25 +469,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
                 Text(text = message.text, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onPrimary)
             }
             else if(message.isImage){
-                val fileName = "K-GPT_Image_${message.id}"
-                when (message.mimeType) {
-                    "image/jpeg" -> fileName.plus(".jpg")
-                    "image/png" -> fileName.plus(".png")
-                    else -> fileName.plus(".jpg")
-                }
-                DisplayImageWithDownload(imageData = message.imageData!!, mimeType = message.mimeType!!) { bitmap ->
-                    val launcher = (context as MainActivity).initializeSaveImageLauncher(
-                        context as ComponentActivity,
-                        bitmap,
-                        message.mimeType
-                    )
-                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                        type = message.mimeType
-                        putExtra(Intent.EXTRA_TITLE, fileName)
-                    }
-                    launcher.launch(intent)
-                }
+                DisplayImageWithDownload(imageData = message.imageData!!, mimeType = message.mimeType!!, onDownloadClick = onDownloadClick)
             }
             else if(message.fromHistory || !animateText){
                 StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)
@@ -523,7 +540,7 @@ fun ThinkingBubble(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-fun ModelSpinner(modifier: Modifier = Modifier, type: String = "Gemini", onModelSelected: (String) -> Unit = {}) {
+fun ModelSpinner(modifier: Modifier = Modifier, initialModel:  String = "", type: String = "Gemini", onModelSelected: (String) -> Unit = {}) {
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
@@ -536,10 +553,15 @@ fun ModelSpinner(modifier: Modifier = Modifier, type: String = "Gemini", onModel
         }
     }
     var selectedModel by rememberSaveable {
-        mutableStateOf(modelsList[0])
+        mutableStateOf("")
     }
+
     var parentWidth by remember {
         mutableStateOf(0.dp)
+    }
+
+    LaunchedEffect(initialModel) {
+        selectedModel = initialModel
     }
 
     Row (modifier = modifier
@@ -554,6 +576,8 @@ fun ModelSpinner(modifier: Modifier = Modifier, type: String = "Gemini", onModel
                 text = selectedModel,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .clip(RectangleShape)
                     .border(width = 1.dp, color = MaterialTheme.colorScheme.primary)

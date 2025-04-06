@@ -4,11 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -20,11 +18,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.apps.kunalfarmah.k_gpt.navigation.AppNavigator
+import com.apps.kunalfarmah.k_gpt.network.model.Event
 import com.apps.kunalfarmah.k_gpt.ui.components.AppBar
 import com.apps.kunalfarmah.k_gpt.ui.components.BottomTabBar
 import com.apps.kunalfarmah.k_gpt.ui.theme.KGPTTheme
@@ -33,20 +31,68 @@ import com.apps.kunalfarmah.k_gpt.viewmodel.GeminiViewModel
 import com.apps.kunalfarmah.k_gpt.viewmodel.OpenAIViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.io.OutputStream
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    lateinit var saveImageLauncher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val geminiViewModel: GeminiViewModel by viewModels()
         val openAIViewModel: OpenAIViewModel by viewModels()
         enableEdgeToEdge()
+
+        saveImageLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    var outputStream: OutputStream? = null
+                    result.data?.data?.let { uri ->
+                        lifecycleScope.launch(Dispatchers.Default) {
+                            geminiViewModel.imageData.collectLatest {
+                                try {
+                                    outputStream =
+                                        this@MainActivity.contentResolver.openOutputStream(uri)
+                                    outputStream?.use { outputStream ->
+                                        it.bitmap?.compress(
+                                            when (it.mimeType) {
+                                                "image/jpeg" -> Bitmap.CompressFormat.JPEG
+                                                "image/png" -> Bitmap.CompressFormat.PNG
+                                                else -> Bitmap.CompressFormat.JPEG
+                                            },
+                                            100,
+                                            outputStream
+                                        )
+                                    }
+                                    it.platform.let {
+                                        if (it == "Gemini") {
+                                            geminiViewModel.alert(Event.Toast("Image saved successfully"))
+                                        } else {
+                                            openAIViewModel.alert(Event.Toast("Image saved successfully"))
+                                        }
+                                    }
+                                } catch (_: IOException) {
+                                    it.platform.let {
+                                        if (it == "Gemini") {
+                                            geminiViewModel.alert(Event.Toast("Failed to save image"))
+                                        } else {
+                                            openAIViewModel.alert(Event.Toast("Failed to save image"))
+                                        }
+                                    }
+                                }
+                            }
+                        }.invokeOnCompletion {
+                            outputStream?.close()
+                        }
+                    }
+                }
+            }
+
         setContent {
             KGPTTheme {
                 val navController = rememberNavController()
@@ -84,59 +130,6 @@ class MainActivity : ComponentActivity() {
                     }
                 ) { innerPadding ->
                     AppNavigator(navController, Modifier.padding(innerPadding))
-                }
-            }
-        }
-    }
-
-    fun initializeSaveImageLauncher(
-        caller: ActivityResultCaller,
-        bitmap: Bitmap,
-        mimeType: String,
-    ): ActivityResultLauncher<Intent> {
-        return caller.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                result.data?.data?.let { uri ->
-                    //Now we have the URI where we need to write the bitmap to, which may be in a different location than downloads (API < 29)
-                   lifecycleScope.launch(Dispatchers.IO) { // Launch a coroutine on the IO dispatcher
-                        try {
-                            this@MainActivity.contentResolver.openOutputStream(uri)
-                                ?.use { outputStream ->
-                                    when (mimeType) {
-                                        "image/jpeg" -> bitmap.compress(
-                                            Bitmap.CompressFormat.JPEG,
-                                            100,
-                                            outputStream
-                                        )
-
-                                        "image/png" -> bitmap.compress(
-                                            Bitmap.CompressFormat.PNG,
-                                            100,
-                                            outputStream
-                                        )
-                                    }
-                                }
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    "Image saved successfully",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    "Failed to save image",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-
-                    }
-
                 }
             }
         }

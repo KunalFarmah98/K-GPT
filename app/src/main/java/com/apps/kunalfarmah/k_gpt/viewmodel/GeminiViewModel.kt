@@ -92,13 +92,13 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
                     Message(isUser = false, text = response.errorMessage, platform = "Gemini")
                 }
                 else {
-                    val messageResponse = response.candidates[0].content.parts[0]
+                    val messageResponse = response.candidates[0].content.parts[0].inlineData
                     Message(
                         isUser = false,
                         platform = "Gemini",
                         isImage = true,
-                        imageData = messageResponse.inlineData.data,
-                        mimeType = messageResponse.inlineData.mimeType
+                        imageData = messageResponse.data,
+                        mimeType = messageResponse.mimeType
                     )
                 }
             }

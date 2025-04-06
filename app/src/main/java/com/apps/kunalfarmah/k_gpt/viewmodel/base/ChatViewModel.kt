@@ -2,6 +2,7 @@ package com.apps.kunalfarmah.k_gpt.viewmodel.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.apps.kunalfarmah.k_gpt.data.ImageData
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.network.model.Event
 import com.apps.kunalfarmah.k_gpt.repository.base.MessagesRepository
@@ -23,6 +24,9 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
     // history loading state needs to be shared by all screen so we need a replay cache
     internal val _historyLoading = MutableSharedFlow<Event.HistoryLoading>(replay = 1)
     val historyLoading = _historyLoading.asSharedFlow()
+
+    internal val _imageData = MutableStateFlow<ImageData>(ImageData())
+    val imageData = _imageData.asStateFlow()
 
     // alerts are one time events, so no replay cache required here
     internal val _alerts = MutableSharedFlow<Event>()
@@ -56,6 +60,16 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
     fun toggleMaxTokensDialog(show: Boolean){
         viewModelScope.launch {
             _alerts.emit(Event.MaxTokensDialog(show))
+        }
+    }
+
+    fun setImageData(imageData: ImageData){
+        _imageData.value = imageData
+    }
+
+    fun alert(event: Event){
+        viewModelScope.launch {
+            _alerts.emit(event)
         }
     }
 

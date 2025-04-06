@@ -39,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.apps.kunalfarmah.k_gpt.GeminiModels
 import com.apps.kunalfarmah.k_gpt.OpenAIModels
+import com.apps.kunalfarmah.k_gpt.data.ImageData
 import com.apps.kunalfarmah.k_gpt.dataStore
 import com.apps.kunalfarmah.k_gpt.getMaxTokens
 import com.apps.kunalfarmah.k_gpt.network.model.Event
@@ -182,7 +183,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         Column(
             modifier = modifier.imePadding()
         ) {
-            ModelSpinner(type = platform, onModelSelected = { model = it })
+            ModelSpinner(type = platform, initialModel = model, onModelSelected = { model = it })
             LazyColumn(
                 modifier = Modifier
                     .padding(8.dp)
@@ -206,6 +207,9 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                         isResponding = isResponding,
                         onResponseCompleted = {
                             isResponding = false
+                        },
+                        onImageSelected = { imageData ->
+                            viewModel.setImageData(ImageData(imageData.bitmap, imageData.mimeType, platform))
                         }
                     )
                 }
@@ -231,6 +235,9 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                         }
                         isResponding = true
                     }
+                },
+                onGenerateImage = {
+                    model = GeminiModels.GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION.modelName
                 },
                 placeHolder =
                     model.let {
