@@ -18,7 +18,9 @@ enum class OpenAIModels(val modelName: String) {
     GPT_4O("gpt-4o"),
     GPT_3_5_TURBO("gpt-3.5-turbo"),
     O1_MINI("o1-mini"),
-    O3_MINI("o3-mini");
+    O3_MINI("o3-mini"),
+    DALL_E_2("dall-e-2"),
+    DALL_E_3("dall-e-3");
 
     override fun toString(): String {
         return modelName

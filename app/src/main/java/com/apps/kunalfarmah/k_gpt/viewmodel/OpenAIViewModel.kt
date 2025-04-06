@@ -3,6 +3,7 @@ package com.apps.kunalfarmah.k_gpt.viewmodel
 import androidx.lifecycle.viewModelScope
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.network.model.Event
+import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIImageGenerationRequest
 import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIRequest
 import com.apps.kunalfarmah.k_gpt.repository.OpenAIRepository
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
@@ -73,6 +74,30 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
         request: String,
         maxTokens: Int?
     ) {
-        TODO("Not yet implemented")
+        val openAIRequest = OpenAIImageGenerationRequest(
+            model = model,
+            prompt = request,
+            n = 1
+        )
+
+        viewModelScope.launch {
+            val userMessage = Message(
+                isUser = true,
+                text = request,
+                platform = "OpenAI",
+                firstMessageInDay = (_messages.value.isEmpty() || getDate(_messages.value.last().time) != getDate(
+                    Date().time
+                ))
+            )
+            _isLoading.value = true
+            _messages.value = _messages.value + userMessage
+            val response = networkRepository.generateImage(openAIRequest)
+            var message = Message(isUser = false, text = "Something went wrong", platform = "OpenAI")
+            // TODO: get actual response and check
+            _isLoading.value = false
+            _messages.value = _messages.value + message
+            networkRepository.insertMessage(userMessage)
+            networkRepository.insertMessage(message)
+        }
     }
 }

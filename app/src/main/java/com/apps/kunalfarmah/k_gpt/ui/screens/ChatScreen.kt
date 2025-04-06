@@ -223,7 +223,8 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                 onSend = { text ->
                     if (text.isNotBlank()) {
                         model.let { model ->
-                            if (model == GeminiModels.GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION.modelName) {
+                            if (model == GeminiModels.GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION.modelName
+                                || model.contains("dall-e")) {
                                 viewModel.generateImage(model = model, request = text)
                             } else {
                                 viewModel.generateRequest(
@@ -237,11 +238,19 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                     }
                 },
                 onGenerateImage = {
-                    model = GeminiModels.GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION.modelName
+                    model = platform.let{
+                        if(it == "Gemini") {
+                            GeminiModels.GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION.modelName
+                        }
+                        else{
+                            OpenAIModels.DALL_E_2.modelName
+                        }
+                    }
                 },
                 placeHolder =
                     model.let {
-                        if (it == GeminiModels.GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION.modelName) {
+                        if (it == GeminiModels.GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION.modelName
+                            || it.contains("dall-e")) {
                             "Enter your image prompt"
                         } else {
                             "Enter your message"

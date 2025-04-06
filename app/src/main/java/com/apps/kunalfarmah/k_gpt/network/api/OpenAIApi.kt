@@ -1,8 +1,10 @@
 package com.apps.kunalfarmah.k_gpt.network.api
 
 import com.apps.kunalfarmah.k_gpt.BuildConfig
+import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIImageGenerationRequest
 import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIRequest
 import com.apps.kunalfarmah.k_gpt.network.model.openAI.OpenAIResponse
+import org.json.JSONObject
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -15,4 +17,12 @@ interface OpenAIApi {
         @Header("content-type") contentType: String =  "application/json",
         @Body body: OpenAIRequest
     ): Response<OpenAIResponse>
+
+    @POST("images/generations")
+    suspend fun generateImage(
+        @Header("Authorization") auth:String = "Bearer ${BuildConfig.OPEN_AI_API_KEY}",
+        @Header("content-type") contentType: String =  "application/json",
+        @Body body: OpenAIImageGenerationRequest
+    ): Response<JSONObject>
+
 }
