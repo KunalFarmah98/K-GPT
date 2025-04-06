@@ -20,6 +20,11 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
     internal val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading.asStateFlow()
 
+    // history loading state needs to be shared by all screen so we need a replay cache
+    internal val _historyLoading = MutableSharedFlow<Event.HistoryLoading>(replay = 1)
+    val historyLoading = _historyLoading.asSharedFlow()
+
+    // alerts are one time events, so no replay cache required here
     internal val _alerts = MutableSharedFlow<Event>()
     val alerts = _alerts.asSharedFlow()
 
@@ -32,7 +37,9 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
 
     fun getAllMessages(platform: String){
         viewModelScope.launch(Dispatchers.IO) {
+            _historyLoading.emit(Event.HistoryLoading(true))
             _messages.value = messagesRepository.getAllMessages(platform)
+            _historyLoading.emit(Event.HistoryLoading(false))
             if(_messages.value.isEmpty()){
                 _alerts.emit(Event.Toast("No $platform History Found"))
             }

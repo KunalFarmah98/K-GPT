@@ -21,7 +21,14 @@ class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIR
             messages = listOf(
                 OpenAIRequest.Message(
                     role = "user",
-                    content = request
+                    content = maxTokens.let { tokens ->
+                        if(tokens != null && tokens > 0){
+                            request.plus(" in under $tokens tokens")
+                        }
+                        else{
+                            request
+                        }
+                    }
                 )
             )
         )
