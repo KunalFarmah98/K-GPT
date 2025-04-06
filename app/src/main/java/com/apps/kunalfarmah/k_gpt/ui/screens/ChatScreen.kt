@@ -2,13 +2,18 @@ package com.apps.kunalfarmah.k_gpt.ui.screens
 
 import android.view.ViewTreeObserver
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -19,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
@@ -26,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,6 +58,9 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
 
     var messages = viewModel.messages.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    var messagesLoading by rememberSaveable {
+        mutableStateOf(false)
+    }
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     var model by rememberSaveable {
@@ -91,24 +101,31 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
     val datastore = context.dataStore
 
     LaunchedEffect(true) {
-        launch{
-            datastore.getMaxTokens().let{
-                maxTokens = if(it == null || it == 0){
+        launch {
+            datastore.getMaxTokens().let {
+                maxTokens = if (it == null || it == 0) {
                     null
-                } else{
+                } else {
                     it
                 }
             }
         }
-        viewModel.alerts.collect {
-            if(it is Event.MaxTokensDialog){
-                showDialog = it.show
+        launch {
+            viewModel.historyLoading.collect {
+                messagesLoading = it.isLoading
             }
-            if(it is Event.Toast){
-                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-            }
-            if(it is Event.LimitExceeded){
-                limitExceededError = it.message
+        }
+        launch {
+            viewModel.alerts.collect {
+                if (it is Event.MaxTokensDialog) {
+                    showDialog = it.show
+                }
+                if (it is Event.Toast) {
+                    Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                }
+                if (it is Event.LimitExceeded) {
+                    limitExceededError = it.message
+                }
             }
         }
     }
@@ -152,58 +169,74 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         KeepScreenOn()
     }
 
-    Column(
-        modifier = modifier.imePadding()
-    ) {
-        ModelSpinner(type = platform, onModelSelected = {model = it})
-        LazyColumn(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-                .weight(1f)
-                .onSizeChanged {
-                    currentContentSize = it
-                },
-            state = listState
+    if(messagesLoading){
+        Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-
-            items(items = messages.value, key = {it.id}) {
-                ChatBubble(
-                    modifier = Modifier.onGloballyPositioned { pos ->
-                      if(messages.value.last().id === it.id){
-                          chatBubbleSize = pos.size.height
-                      }
-                    },
-                    message = it,
-                    listState = listState,
-                    isResponding = isResponding,
-                    onResponseCompleted = {
-                        isResponding = false
-                    }
-                )
-            }
-            item{
-                if(isLoading){
-                    ThinkingBubble()
-                }
-            }
+            CircularProgressIndicator(modifier = Modifier.size(40.dp))
+            Text(text = "Loading $platform message history", modifier = Modifier.padding(20.dp), fontSize = 15.sp)
         }
-        Input(
-            onSend = {
-                if (it.isNotBlank()) {
-                    viewModel.generateRequest(model = model, request = it, maxTokens = maxTokens)
-                    isResponding = true
+    }
+    else {
+        Column(
+            modifier = modifier.imePadding()
+        ) {
+            ModelSpinner(type = platform, onModelSelected = { model = it })
+            LazyColumn(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .onSizeChanged {
+                        currentContentSize = it
+                    },
+                state = listState
+            ) {
+
+                items(items = messages.value, key = { it.id }) {
+                    ChatBubble(
+                        modifier = Modifier.onGloballyPositioned { pos ->
+                            if (messages.value.last().id === it.id) {
+                                chatBubbleSize = pos.size.height
+                            }
+                        },
+                        message = it,
+                        listState = listState,
+                        isResponding = isResponding,
+                        onResponseCompleted = {
+                            isResponding = false
+                        }
+                    )
                 }
-            },
-            isResponding = !isLoading && isResponding,
-            isThinking = isLoading,
-            onResponseStopped = {
-                isResponding = false
-                scope.launch {
-                    delay(100)
-                    listState.scrollToItem(messages.value.size - 1, chatBubbleSize)
+                item {
+                    if (isLoading) {
+                        ThinkingBubble()
+                    }
                 }
-            })
+            }
+            Input(
+                onSend = {
+                    if (it.isNotBlank()) {
+                        viewModel.generateRequest(
+                            model = model,
+                            request = it,
+                            maxTokens = maxTokens
+                        )
+                        isResponding = true
+                    }
+                },
+                isResponding = !isLoading && isResponding,
+                isThinking = isLoading,
+                onResponseStopped = {
+                    isResponding = false
+                    scope.launch {
+                        delay(100)
+                        listState.scrollToItem(messages.value.size - 1, chatBubbleSize)
+                    }
+                })
+        }
     }
 
     MaxTokensDialog(
