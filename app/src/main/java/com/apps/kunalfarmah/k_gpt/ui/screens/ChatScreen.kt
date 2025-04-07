@@ -12,9 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -178,7 +178,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
             verticalArrangement = Arrangement.Center
         ) {
             CircularProgressIndicator(modifier = Modifier.size(40.dp))
-            Text(text = "Loading $platform message history", modifier = Modifier.padding(20.dp), fontSize = 15.sp, color = MaterialTheme.colors.onSurface)
+            Text(text = "Loading $platform message history", modifier = Modifier.padding(20.dp), fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface)
         }
     } else {
         Column(
