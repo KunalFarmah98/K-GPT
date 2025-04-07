@@ -356,12 +356,17 @@ fun DisplayImageWithDownload(imageData: String, mimeType: String, onDownloadClic
                     contentDescription = "Decoded Image",
                     contentScale = ContentScale.Fit
                 )
-                IconButton(
+                Card(
                     onClick = {onDownloadClick(bitmap)},
+                    colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.primary),
                     modifier = Modifier
+                        .size(35.dp)
                         .align(Alignment.BottomEnd)
+                        .padding(end = 5.dp, bottom = 5.dp)
                 ) {
-                    Icon(modifier = Modifier.size(20.dp), painter = painterResource(R.drawable.baseline_download_24), contentDescription = "Download Image", tint = MaterialTheme.colorScheme.onSecondary)
+                    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                        Icon(modifier = Modifier.size(18.dp), painter = painterResource(R.drawable.baseline_download_24), contentDescription = "Download Image", tint = MaterialTheme.colorScheme.onPrimary)
+                    }
                 }
             }
         } else {
@@ -577,7 +582,7 @@ fun ModelSpinner(modifier: Modifier = Modifier, initialModel:  String = "", type
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                overflow = TextOverflow.Clip,
                 modifier = Modifier
                     .clip(RectangleShape)
                     .border(width = 1.dp, color = MaterialTheme.colorScheme.primary)

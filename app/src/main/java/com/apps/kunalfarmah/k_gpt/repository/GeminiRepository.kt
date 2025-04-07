@@ -40,7 +40,9 @@ class GeminiRepository @Inject constructor(private val geminiApi: GeminiApi, mes
             }
         }
         catch (_: Exception){
-            GeminiImageResponse()
+            GeminiImageResponse(
+                errorMessage = "Something went wrong. Request timed out."
+            )
         }
     }
 }

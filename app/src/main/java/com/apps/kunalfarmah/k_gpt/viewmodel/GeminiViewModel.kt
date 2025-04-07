@@ -84,23 +84,22 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
             _isLoading.value = true
             _messages.value = _messages.value + userMessage
             val response = networkRepository.generateImage(modelName, geminiImageRequest)
-            var message = if(response.candidates.isEmpty()){
+
+            var message = if (!response.errorMessage.isNullOrEmpty()) {
+                Message(isUser = false, text = response.errorMessage, platform = "Gemini")
+            }
+            else if (response.candidates.isEmpty()) {
                 Message(isUser = false, text = "Something went wrong", platform = "Gemini")
             }
-            else{
-                if(!response.errorMessage.isNullOrEmpty()){
-                    Message(isUser = false, text = response.errorMessage, platform = "Gemini")
-                }
-                else {
-                    val messageResponse = response.candidates[0].content.parts[0].inlineData
-                    Message(
-                        isUser = false,
-                        platform = "Gemini",
-                        isImage = true,
-                        imageData = messageResponse.data,
-                        mimeType = messageResponse.mimeType
-                    )
-                }
+            else {
+                val messageResponse = response.candidates[0].content.parts[0].inlineData
+                Message(
+                    isUser = false,
+                    platform = "Gemini",
+                    isImage = true,
+                    imageData = messageResponse.data,
+                    mimeType = messageResponse.mimeType
+                )
             }
             _isLoading.value = false
             _messages.value = _messages.value + message
