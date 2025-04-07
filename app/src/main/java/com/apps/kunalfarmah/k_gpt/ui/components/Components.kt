@@ -360,12 +360,12 @@ fun DisplayImageWithDownload(imageData: String, mimeType: String, onDownloadClic
                     onClick = {onDownloadClick(bitmap)},
                     colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.primary),
                     modifier = Modifier
-                        .size(35.dp)
+                        .size(45.dp)
                         .align(Alignment.BottomEnd)
-                        .padding(end = 5.dp, bottom = 5.dp)
+                        .padding(end = 8.dp, bottom = 8.dp)
                 ) {
                     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        Icon(modifier = Modifier.size(18.dp), painter = painterResource(R.drawable.baseline_download_24), contentDescription = "Download Image", tint = MaterialTheme.colorScheme.onPrimary)
+                        Icon(modifier = Modifier.size(20.dp), painter = painterResource(R.drawable.baseline_download_24), contentDescription = "Download Image", tint = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }
@@ -427,7 +427,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             }
             (context as MainActivity).saveImageLauncher.launch(intent)
         }
-        boxModifier.width(250.dp)
+        boxModifier
             .combinedClickable(
                 interactionSource = interactionSource,
                 indication = ripple(bounded = true),
