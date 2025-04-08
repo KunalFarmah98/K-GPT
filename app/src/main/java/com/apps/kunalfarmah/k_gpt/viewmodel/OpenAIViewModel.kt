@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OpenAIViewModel @Inject constructor(private val networkRepository: OpenAIRepository): ChatViewModel(networkRepository) {
-    override fun generateRequest(model: String, request: String, maxTokens: Int?) {
+    override fun generateResponse(model: String, request: String, maxTokens: Int?) {
         val openAIRequest = OpenAIRequest(
             model = model,
             max_tokens = maxTokens,

@@ -4,10 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.imePadding
@@ -27,6 +29,7 @@ import com.apps.kunalfarmah.k_gpt.ui.components.AppBar
 import com.apps.kunalfarmah.k_gpt.ui.components.BottomTabBar
 import com.apps.kunalfarmah.k_gpt.ui.theme.KGPTTheme
 import com.apps.kunalfarmah.k_gpt.util.SettingsKeys
+import com.apps.kunalfarmah.k_gpt.util.Util
 import com.apps.kunalfarmah.k_gpt.viewmodel.GeminiViewModel
 import com.apps.kunalfarmah.k_gpt.viewmodel.OpenAIViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,11 +45,27 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     lateinit var saveImageLauncher: ActivityResultLauncher<Intent>
+    lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val geminiViewModel: GeminiViewModel by viewModels()
         val openAIViewModel: OpenAIViewModel by viewModels()
         enableEdgeToEdge()
+        pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                lifecycleScope.launch(Dispatchers.Default) {
+                    val mimeType = Util.getMimeTypeFromUri(this@MainActivity, uri) ?: "image/jpeg"
+                    val base64Data = Util.uriToBase64(this@MainActivity, uri, mimeType) ?: ""
+                    geminiViewModel.setUploadImageData(base64Data = base64Data, mimeType = mimeType)
+                }.invokeOnCompletion {
+                    if(it == null) {
+                        geminiViewModel.alert(Event.Toast("Image Uploaded Successfully"))
+                    }
+                }
+            } else {
+                Toast.makeText(this, "No media selected", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         saveImageLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

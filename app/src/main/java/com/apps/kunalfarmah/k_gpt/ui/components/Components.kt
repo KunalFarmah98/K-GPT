@@ -152,7 +152,7 @@ fun KeepScreenOn() {
 
 @Preview
 @Composable
-fun Input(modifier: Modifier = Modifier, placeHolder: String = "", onSend: (String) -> Unit = {}, isThinking: Boolean = false, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}, onGenerateImage: () -> Unit = {}){
+fun Input(modifier: Modifier = Modifier, placeHolder: String = "", onSend: (String) -> Unit = {}, isThinking: Boolean = false, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}, onGenerateImage: () -> Unit = {}, onAttachImage: () -> Unit = {}){
     var text by rememberSaveable {
         mutableStateOf("")
     }
@@ -199,8 +199,11 @@ fun Input(modifier: Modifier = Modifier, placeHolder: String = "", onSend: (Stri
             ),
             trailingIcon = {
                 Row{
+                    IconButton(onClick = onAttachImage){
+                        Icon(modifier = Modifier.padding(end = 0.dp), painter= painterResource(R.drawable.baseline_attach_file_24), tint = MaterialTheme.colorScheme.primary, contentDescription = "image")
+                    }
                     IconButton(onClick = onGenerateImage){
-                        Icon(painterResource(R.drawable.baseline_image_24), tint = MaterialTheme.colorScheme.primary, contentDescription = "image")
+                        Icon(painter = painterResource(R.drawable.baseline_image_24), tint = MaterialTheme.colorScheme.primary, contentDescription = "image")
                     }
                 }
             }
@@ -475,6 +478,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             }
             else if(message.isImage){
                 DisplayImageWithDownload(imageData = message.imageData!!, mimeType = message.mimeType!!, onDownloadClick = onDownloadClick)
+                onResponseCompleted()
             }
             else if(message.fromHistory || !animateText){
                 StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)

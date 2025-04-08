@@ -6,6 +6,7 @@ import com.apps.kunalfarmah.k_gpt.network.model.gemini.Content
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiImageGenerationRequest
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiRequest
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GenerationConfig
+import com.apps.kunalfarmah.k_gpt.network.model.gemini.InlineData
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.Part
 import com.apps.kunalfarmah.k_gpt.repository.GeminiRepository
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GeminiViewModel @Inject constructor(private val networkRepository: GeminiRepository): ChatViewModel(networkRepository) {
-    override fun generateRequest(model: String, request: String, maxTokens: Int?) {
+    override fun generateResponse(model: String, request: String, maxTokens: Int?) {
         val modelName = "$model:generateContent"
         val geminiRequest = GeminiRequest(
             contents = listOf(
@@ -25,6 +26,19 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
                     parts = listOf(
                         Part(
                             text = request
+                        ),
+                        Part(
+                            inlineData = _imageData.value.let {
+                                if(it.base64Data != null) {
+                                    InlineData(
+                                        data = it.base64Data,
+                                        mimeType = it.mimeType!!
+                                    )
+                                }
+                                else{
+                                    null
+                                }
+                            }
                         )
                     )
                 )
@@ -66,7 +80,22 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
             contents = listOf(
                 Content(
                     parts = listOf(
-                        Part(text = request)
+                        Part(
+                            text = request
+                        ),
+                        Part(
+                            inlineData = _imageData.value.let {
+                                if(it.base64Data != null) {
+                                    InlineData(
+                                        data = it.base64Data,
+                                        mimeType = it.mimeType!!
+                                    )
+                                }
+                                else{
+                                    null
+                                }
+                            }
+                        )
                     )
                 )
             ),

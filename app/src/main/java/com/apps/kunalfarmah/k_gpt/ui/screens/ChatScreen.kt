@@ -2,6 +2,8 @@ package com.apps.kunalfarmah.k_gpt.ui.screens
 
 import android.view.ViewTreeObserver
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +41,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.apps.kunalfarmah.k_gpt.GeminiModels
+import com.apps.kunalfarmah.k_gpt.MainActivity
 import com.apps.kunalfarmah.k_gpt.OpenAIModels
 import com.apps.kunalfarmah.k_gpt.data.ImageData
 import com.apps.kunalfarmah.k_gpt.dataStore
@@ -208,9 +211,10 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                         isResponding = isResponding,
                         onResponseCompleted = {
                             isResponding = false
+                            viewModel.clearImageData()
                         },
                         onImageSelected = { imageData ->
-                            viewModel.setImageData(ImageData(imageData.bitmap, imageData.mimeType, platform))
+                            viewModel.setImageData(ImageData(bitmap = imageData.bitmap, mimeType = imageData.mimeType, platform = platform))
                         }
                     )
                 }
@@ -228,7 +232,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                                 || model.contains("dall-e")) {
                                 viewModel.generateImage(model = model, request = text)
                             } else {
-                                viewModel.generateRequest(
+                                viewModel.generateResponse(
                                     model = model,
                                     request = text,
                                     maxTokens = maxTokens
@@ -239,6 +243,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                     }
                 },
                 onGenerateImage = {
+                    viewModel.clearImageData()
                     model = platform.let{
                         if(it == "Gemini") {
                             GeminiModels.GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION.modelName
@@ -247,6 +252,10 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                             OpenAIModels.DALL_E_2.modelName
                         }
                     }
+                },
+                onAttachImage = {
+                  viewModel.clearImageData()
+                    (context as MainActivity).pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
                 },
                 placeHolder =
                     model.let {

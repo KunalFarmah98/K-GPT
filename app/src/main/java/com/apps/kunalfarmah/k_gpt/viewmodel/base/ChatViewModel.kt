@@ -73,7 +73,16 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
         }
     }
 
-    abstract fun generateRequest(model: String, request: String, maxTokens: Int? = null)
+    fun setUploadImageData(base64Data: String, mimeType: String){
+        _imageData.value = ImageData(base64Data = base64Data, mimeType = mimeType)
+    }
+
+    fun clearImageData(){
+        _imageData.value = ImageData()
+    }
+
+    abstract fun generateResponse(model: String, request: String, maxTokens: Int? = null)
 
     abstract fun generateImage(model: String, request: String, maxTokens: Int? = null)
+
 }

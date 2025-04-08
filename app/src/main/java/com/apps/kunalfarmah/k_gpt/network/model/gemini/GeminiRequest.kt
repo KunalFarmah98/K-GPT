@@ -5,18 +5,20 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class InlineData(
-    @SerialName("type")
-    val type: String = "",
     @SerialName("data")
-    val data: String = ""
+    val `data`: String = "",
+    @SerialName("mime_type")
+    val mimeType: String = ""
 )
+
 @Serializable
 data class Part(
-    @SerialName("text")
-    val text: String = "",
     @SerialName("inline_data")
-    val inlineData: InlineData? = null
+    val inlineData: InlineData ?= null,
+    @SerialName("text")
+    val text: String ?= null
 )
+
 @Serializable
 data class Content(
     @SerialName("parts")
