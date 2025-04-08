@@ -2,8 +2,11 @@ package com.apps.kunalfarmah.k_gpt.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.apps.kunalfarmah.k_gpt.data.Message
+import com.apps.kunalfarmah.k_gpt.network.model.gemini.Content
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiImageGenerationRequest
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiRequest
+import com.apps.kunalfarmah.k_gpt.network.model.gemini.GenerationConfig
+import com.apps.kunalfarmah.k_gpt.network.model.gemini.Part
 import com.apps.kunalfarmah.k_gpt.repository.GeminiRepository
 import com.apps.kunalfarmah.k_gpt.util.Util.getDate
 import com.apps.kunalfarmah.k_gpt.viewmodel.base.ChatViewModel
@@ -18,9 +21,9 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
         val modelName = "$model:generateContent"
         val geminiRequest = GeminiRequest(
             contents = listOf(
-                GeminiRequest.Content(
+                Content(
                     parts = listOf(
-                        GeminiRequest.Content.Part(
+                        Part(
                             text = request
                         )
                     )
@@ -61,13 +64,13 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
         val modelName = "$model:generateContent"
         val geminiImageRequest = GeminiImageGenerationRequest(
             contents = listOf(
-                GeminiImageGenerationRequest.Content(
+                Content(
                     parts = listOf(
-                        GeminiImageGenerationRequest.Content.Part(text = request)
+                        Part(text = request)
                     )
                 )
             ),
-            generationConfig = GeminiImageGenerationRequest.GenerationConfig(
+            generationConfig = GenerationConfig(
                 responseModalities = listOf("Text", "Image")
             )
         )
