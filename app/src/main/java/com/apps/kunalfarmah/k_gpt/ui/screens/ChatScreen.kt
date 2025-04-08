@@ -167,7 +167,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         }
     }
 
-    if(isResponding){
+    if(isResponding || isLoading){
         KeepScreenOn()
     }
 
