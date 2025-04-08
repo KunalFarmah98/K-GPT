@@ -19,7 +19,16 @@ data class GeminiImageGenerationRequest(
         @Serializable
         data class Part(
             @SerialName("text")
-            val text: String = ""
+            val text: String = "",
+            @SerialName("inline_data")
+            val inlineData: InlineData? = null
+        )
+        @Serializable
+        data class InlineData(
+            @SerialName("type")
+            val type: String = "",
+            @SerialName("data")
+            val data: String = ""
         )
     }
 

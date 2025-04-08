@@ -33,7 +33,9 @@ data class GeminiImageResponse(
             @Serializable
             data class Part(
                 @SerialName("inlineData")
-                val inlineData: InlineData = InlineData()
+                val inlineData: InlineData? = null,
+                @SerialName("text")
+                val text: String? = null
             ) {
                 @Serializable
                 data class InlineData(
