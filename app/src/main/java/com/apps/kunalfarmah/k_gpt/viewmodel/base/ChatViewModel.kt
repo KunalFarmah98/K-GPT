@@ -15,21 +15,23 @@ import kotlinx.coroutines.launch
 import java.util.Date
 
 abstract class ChatViewModel(private val messagesRepository: MessagesRepository): ViewModel() {
-    internal val _messages = MutableStateFlow<List<Message>>(listOf())
+    protected val _messages = MutableStateFlow<List<Message>>(listOf())
     val messages = _messages.asStateFlow()
 
-    internal val _isLoading = MutableStateFlow<Boolean>(false)
+    protected val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading.asStateFlow()
 
     // history loading state needs to be shared by all screen so we need a replay cache
-    internal val _historyLoading = MutableSharedFlow<Event.HistoryLoading>(replay = 1)
+    protected val _historyLoading = MutableSharedFlow<Event.HistoryLoading>(replay = 1)
     val historyLoading = _historyLoading.asSharedFlow()
 
-    internal val _imageData = MutableStateFlow<ImageData>(ImageData())
-    val imageData = _imageData.asStateFlow()
+    protected val _imageData = MutableStateFlow<ImageData>(ImageData())
+
+    protected val _imageToBeDownloaded = MutableStateFlow<ImageData>(ImageData())
+    val imageToBeDownloaded = _imageToBeDownloaded.asStateFlow()
 
     // alerts are one time events, so no replay cache required here
-    internal val _alerts = MutableSharedFlow<Event>()
+    protected val _alerts = MutableSharedFlow<Event>()
     val alerts = _alerts.asSharedFlow()
 
     init {
@@ -63,6 +65,10 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
         }
     }
 
+    fun setDownloadedImageData(imageData: ImageData){
+        _imageToBeDownloaded.value = imageData
+    }
+
     fun setImageData(imageData: ImageData){
         _imageData.value = imageData
     }
@@ -79,6 +85,20 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
 
     fun clearImageData(){
         _imageData.value = ImageData()
+    }
+
+    fun clearDownloadedImageData(){
+        _imageToBeDownloaded.value = ImageData()
+    }
+
+    fun uploadImageToMessages(base64Data: String, mimeType: String){
+        _messages.value +=  Message(
+            isUser = true,
+            platform = "Gemini",
+            isImage = true,
+            imageData = base64Data,
+            mimeType = mimeType
+        )
     }
 
     abstract fun generateResponse(model: String, request: String, maxTokens: Int? = null)

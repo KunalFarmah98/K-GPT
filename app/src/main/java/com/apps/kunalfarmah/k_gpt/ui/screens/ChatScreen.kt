@@ -142,6 +142,10 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         }
     }
 
+    LaunchedEffect(model) {
+        viewModel.clearImageData()
+    }
+
     // Access the current View and keyboard visibility state
     val view = LocalView.current
     var isImeVisible by remember { mutableStateOf(false) }
@@ -170,7 +174,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         }
     }
 
-    if(isResponding || isLoading){
+    if(isResponding || isLoading || messagesLoading){
         KeepScreenOn()
     }
 
@@ -211,10 +215,9 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                         isResponding = isResponding,
                         onResponseCompleted = {
                             isResponding = false
-                            viewModel.clearImageData()
                         },
                         onImageSelected = { imageData ->
-                            viewModel.setImageData(ImageData(bitmap = imageData.bitmap, mimeType = imageData.mimeType, platform = platform))
+                            viewModel.setDownloadedImageData(ImageData(bitmap = imageData.bitmap, mimeType = imageData.mimeType, platform = platform))
                         }
                     )
                 }
@@ -243,7 +246,6 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                     }
                 },
                 onGenerateImage = {
-                    viewModel.clearImageData()
                     model = platform.let{
                         if(it == "Gemini") {
                             GeminiModels.GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION.modelName

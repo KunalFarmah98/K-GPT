@@ -80,7 +80,7 @@ object Util {
                         }
                     }, 100, byteArrayOutputStream) // You can adjust the compression format and quality
                     val byteArray = byteArrayOutputStream.toByteArray()
-                    Base64.encodeToString(byteArray, Base64.DEFAULT)
+                    Base64.encodeToString(byteArray, Base64.DEFAULT).replace("\n", "")
                 }
             } else {
                 null

@@ -57,10 +57,7 @@ class MainActivity : ComponentActivity() {
                     val mimeType = Util.getMimeTypeFromUri(this@MainActivity, uri) ?: "image/jpeg"
                     val base64Data = Util.uriToBase64(this@MainActivity, uri, mimeType) ?: ""
                     geminiViewModel.setUploadImageData(base64Data = base64Data, mimeType = mimeType)
-                }.invokeOnCompletion {
-                    if(it == null) {
-                        geminiViewModel.alert(Event.Toast("Image Uploaded Successfully"))
-                    }
+                    geminiViewModel.uploadImageToMessages(base64Data = base64Data, mimeType = mimeType)
                 }
             } else {
                 Toast.makeText(this, "No media selected", Toast.LENGTH_SHORT).show()
@@ -73,7 +70,7 @@ class MainActivity : ComponentActivity() {
                     var outputStream: OutputStream? = null
                     result.data?.data?.let { uri ->
                         lifecycleScope.launch(Dispatchers.Default) {
-                            geminiViewModel.imageData.collectLatest {
+                            geminiViewModel.imageToBeDownloaded.collectLatest {
                                 try {
                                     outputStream =
                                         this@MainActivity.contentResolver.openOutputStream(uri)
@@ -89,6 +86,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                     }
                                     it.platform.let {
+                                        geminiViewModel.clearDownloadedImageData()
                                         if (it == "Gemini") {
                                             geminiViewModel.alert(Event.Toast("Image saved successfully"))
                                         } else {
@@ -96,6 +94,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }
                                 } catch (_: IOException) {
+                                    geminiViewModel.clearDownloadedImageData()
                                     it.platform.let {
                                         if (it == "Gemini") {
                                             geminiViewModel.alert(Event.Toast("Failed to save image"))

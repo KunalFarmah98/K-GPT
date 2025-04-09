@@ -349,7 +349,7 @@ fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateTe
 }
 
 @Composable
-fun DisplayImageWithDownload(imageData: String, mimeType: String, onDownloadClick: (bitmap: Bitmap) -> Unit = {}) {
+fun DisplayImageWithDownload(imageData: String, mimeType: String, isUserMessage: Boolean = false, onDownloadClick: (bitmap: Bitmap) -> Unit = {}) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         val bitmap = Util.decodeImage(imageData, mimeType)
         if (bitmap != null) {
@@ -359,16 +359,28 @@ fun DisplayImageWithDownload(imageData: String, mimeType: String, onDownloadClic
                     contentDescription = "Decoded Image",
                     contentScale = ContentScale.Fit
                 )
-                Card(
-                    onClick = {onDownloadClick(bitmap)},
-                    colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.primary),
-                    modifier = Modifier
-                        .size(45.dp)
-                        .align(Alignment.BottomEnd)
-                        .padding(end = 8.dp, bottom = 8.dp)
-                ) {
-                    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        Icon(modifier = Modifier.size(20.dp), painter = painterResource(R.drawable.baseline_download_24), contentDescription = "Download Image", tint = MaterialTheme.colorScheme.onPrimary)
+                if(!isUserMessage) {
+                    Card(
+                        onClick = { onDownloadClick(bitmap) },
+                        colors = CardDefaults.cardColors()
+                            .copy(containerColor = MaterialTheme.colorScheme.primary),
+                        modifier = Modifier
+                            .size(45.dp)
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 8.dp, bottom = 8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(20.dp),
+                                painter = painterResource(R.drawable.baseline_download_24),
+                                contentDescription = "Download Image",
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
                     }
                 }
             }
@@ -413,33 +425,42 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
     boxModifier = if (isThinking) {
         boxModifier.width(100.dp)
     }
-    else if(message.isImage){
-        fileName = "K-GPT_Image_${Util.getImageTime(message.time)}".plus(
-            when (message.mimeType) {
-                "image/jpeg" -> ".jpg"
-                "image/png" -> ".png"
-                else -> ".jpg"
-            }
-        )
-        onDownloadClick =  { bitmap ->
-            onImageSelected(ImageData(bitmap = bitmap, mimeType = message.mimeType))
-            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = message.mimeType
-                putExtra(Intent.EXTRA_TITLE, fileName)
-            }
-            (context as MainActivity).saveImageLauncher.launch(intent)
-        }
-        boxModifier
-            .combinedClickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = true),
-                onClick = {},
-                onLongClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onDownloadClick(Util.decodeImage(message.imageData!!, message.mimeType ?: "image/png")!!)
+    else if (message.isImage) {
+        if (message.isUser) {
+            boxModifier.size(200.dp)
+        } else {
+            fileName = "K-GPT_Image_${Util.getImageTime(message.time)}".plus(
+                when (message.mimeType) {
+                    "image/jpeg" -> ".jpg"
+                    "image/png" -> ".png"
+                    else -> ".jpg"
                 }
             )
+            onDownloadClick = { bitmap ->
+                onImageSelected(ImageData(bitmap = bitmap, mimeType = message.mimeType))
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = message.mimeType
+                    putExtra(Intent.EXTRA_TITLE, fileName)
+                }
+                (context as MainActivity).saveImageLauncher.launch(intent)
+            }
+            boxModifier
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = ripple(bounded = true),
+                    onClick = {},
+                    onLongClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onDownloadClick(
+                            Util.decodeImage(
+                                message.imageData!!,
+                                message.mimeType ?: "image/png"
+                            )!!
+                        )
+                    }
+                )
+        }
     }
     else{
         boxModifier.combinedClickable(
@@ -473,12 +494,12 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             modifier = boxModifier
         ) {
             // do not animate user messages or messages from history
-            if (message.isUser || isThinking) {
-                Text(text = message.text, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onPrimary)
-            }
-            else if(message.isImage){
-                DisplayImageWithDownload(imageData = message.imageData!!, mimeType = message.mimeType!!, onDownloadClick = onDownloadClick)
+            if(message.isImage){
+                DisplayImageWithDownload(imageData = message.imageData!!, mimeType = message.mimeType!!, isUserMessage = message.isUser, onDownloadClick = onDownloadClick)
                 onResponseCompleted()
+            }
+            else if (message.isUser || isThinking) {
+                Text(text = message.text, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onPrimary)
             }
             else if(message.fromHistory || !animateText){
                 StyledText(text = message.text, color = MaterialTheme.colorScheme.onPrimary)

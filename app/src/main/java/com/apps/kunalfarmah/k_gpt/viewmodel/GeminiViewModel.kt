@@ -1,6 +1,7 @@
 package com.apps.kunalfarmah.k_gpt.viewmodel
 
 import androidx.lifecycle.viewModelScope
+import com.apps.kunalfarmah.k_gpt.data.ImageData
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.Content
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiImageGenerationRequest
@@ -20,30 +21,31 @@ import javax.inject.Inject
 class GeminiViewModel @Inject constructor(private val networkRepository: GeminiRepository): ChatViewModel(networkRepository) {
     override fun generateResponse(model: String, request: String, maxTokens: Int?) {
         val modelName = "$model:generateContent"
-        val geminiRequest = GeminiRequest(
-            contents = listOf(
-                Content(
-                    parts = listOf(
-                        Part(
-                            text = request
-                        ),
-                        Part(
-                            inlineData = _imageData.value.let {
-                                if(it.base64Data != null) {
-                                    InlineData(
-                                        data = it.base64Data,
-                                        mimeType = it.mimeType!!
-                                    )
-                                }
-                                else{
-                                    null
-                                }
-                            }
+        val parts = mutableListOf(
+            Part(
+                text = request
+            )
+        )
+        _imageData.value.let {
+            if(it.base64Data != null) {
+                parts.add(
+                    Part(
+                        inlineData = InlineData(
+                            data = it.base64Data,
+                            mimeType = it.mimeType!!
                         )
                     )
                 )
+            }
+        }
+        val geminiRequest = GeminiRequest(
+            contents = listOf(
+                Content(
+                    parts = parts
+                )
             )
         )
+
         viewModelScope.launch {
             val userMessage = Message(
                 isUser = true,
@@ -76,27 +78,27 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
 
     override fun generateImage(model: String, request: String, maxTokens: Int?) {
         val modelName = "$model:generateContent"
+        val parts = mutableListOf(
+            Part(
+                text = request
+            )
+        )
+        _imageData.value.let {
+            if(it.base64Data != null) {
+                parts.add(
+                    Part(
+                        inlineData = InlineData(
+                            data = it.base64Data,
+                            mimeType = it.mimeType!!
+                        )
+                    )
+                )
+            }
+        }
         val geminiImageRequest = GeminiImageGenerationRequest(
             contents = listOf(
                 Content(
-                    parts = listOf(
-                        Part(
-                            text = request
-                        ),
-                        Part(
-                            inlineData = _imageData.value.let {
-                                if(it.base64Data != null) {
-                                    InlineData(
-                                        data = it.base64Data,
-                                        mimeType = it.mimeType!!
-                                    )
-                                }
-                                else{
-                                    null
-                                }
-                            }
-                        )
-                    )
+                    parts = parts
                 )
             ),
             generationConfig = GenerationConfig(
@@ -126,6 +128,13 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
             else {
                 val messageResponse = response.candidates[0].content.parts[0]
                 if(messageResponse.inlineData != null) {
+                    // set image data so all further image based queries are made on this image
+                    setImageData(
+                        ImageData(
+                            base64Data = messageResponse.inlineData.data,
+                            mimeType = messageResponse.inlineData.mimeType
+                        )
+                    )
                     Message(
                         isUser = false,
                         platform = "Gemini",
