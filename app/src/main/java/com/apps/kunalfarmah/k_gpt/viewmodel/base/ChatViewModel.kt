@@ -27,8 +27,8 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
 
     protected val _imageData = MutableStateFlow<ImageData>(ImageData())
 
-    protected val _imageToBeDownloaded = MutableStateFlow<ImageData>(ImageData())
-    val imageToBeDownloaded = _imageToBeDownloaded.asStateFlow()
+    var imageToBeDownloaded: ImageData ?= null
+    private set
 
     // alerts are one time events, so no replay cache required here
     protected val _alerts = MutableSharedFlow<Event>()
@@ -66,7 +66,7 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
     }
 
     fun setDownloadedImageData(imageData: ImageData){
-        _imageToBeDownloaded.value = imageData
+        imageToBeDownloaded = imageData
     }
 
     fun setImageData(imageData: ImageData){
@@ -88,7 +88,7 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
     }
 
     fun clearDownloadedImageData(){
-        _imageToBeDownloaded.value = ImageData()
+        imageToBeDownloaded = null
     }
 
     fun uploadImageToMessages(base64Data: String, mimeType: String){

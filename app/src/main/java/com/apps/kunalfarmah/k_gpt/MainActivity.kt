@@ -70,37 +70,39 @@ class MainActivity : ComponentActivity() {
                     var outputStream: OutputStream? = null
                     result.data?.data?.let { uri ->
                         lifecycleScope.launch(Dispatchers.Default) {
-                            geminiViewModel.imageToBeDownloaded.collectLatest {
-                                try {
-                                    outputStream =
-                                        this@MainActivity.contentResolver.openOutputStream(uri)
-                                    outputStream?.use { outputStream ->
-                                        it.bitmap?.compress(
-                                            when (it.mimeType) {
-                                                "image/jpeg" -> Bitmap.CompressFormat.JPEG
-                                                "image/png" -> Bitmap.CompressFormat.PNG
-                                                else -> Bitmap.CompressFormat.JPEG
-                                            },
-                                            100,
-                                            outputStream
-                                        )
+                            val image = geminiViewModel.imageToBeDownloaded
+                            if (image == null) {
+                                return@launch
+                            }
+                            try {
+                                outputStream =
+                                    this@MainActivity.contentResolver.openOutputStream(uri)
+                                outputStream?.use { outputStream ->
+                                    image.bitmap?.compress(
+                                        when (image.mimeType) {
+                                            "image/jpeg" -> Bitmap.CompressFormat.JPEG
+                                            "image/png" -> Bitmap.CompressFormat.PNG
+                                            else -> Bitmap.CompressFormat.JPEG
+                                        },
+                                        100,
+                                        outputStream
+                                    )
+                                }
+                                geminiViewModel.clearDownloadedImageData()
+                                image.platform.let {
+                                    if (it == "Gemini") {
+                                        geminiViewModel.alert(Event.Toast("Image saved successfully"))
+                                    } else {
+                                        openAIViewModel.alert(Event.Toast("Image saved successfully"))
                                     }
-                                    it.platform.let {
-                                        geminiViewModel.clearDownloadedImageData()
-                                        if (it == "Gemini") {
-                                            geminiViewModel.alert(Event.Toast("Image saved successfully"))
-                                        } else {
-                                            openAIViewModel.alert(Event.Toast("Image saved successfully"))
-                                        }
-                                    }
-                                } catch (_: IOException) {
-                                    geminiViewModel.clearDownloadedImageData()
-                                    it.platform.let {
-                                        if (it == "Gemini") {
-                                            geminiViewModel.alert(Event.Toast("Failed to save image"))
-                                        } else {
-                                            openAIViewModel.alert(Event.Toast("Failed to save image"))
-                                        }
+                                }
+                            } catch (_: IOException) {
+                                geminiViewModel.clearDownloadedImageData()
+                                image.platform.let {
+                                    if (it == "Gemini") {
+                                        geminiViewModel.alert(Event.Toast("Failed to save image"))
+                                    } else {
+                                        openAIViewModel.alert(Event.Toast("Failed to save image"))
                                     }
                                 }
                             }

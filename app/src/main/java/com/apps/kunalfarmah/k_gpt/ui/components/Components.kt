@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -427,7 +428,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
     }
     else if (message.isImage) {
         if (message.isUser) {
-            boxModifier.size(200.dp)
+            boxModifier.sizeIn(maxWidth = 200.dp, maxHeight = 200.dp)
         } else {
             fileName = "K-GPT_Image_${Util.getImageTime(message.time)}".plus(
                 when (message.mimeType) {
