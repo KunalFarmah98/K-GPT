@@ -8,6 +8,6 @@ import com.apps.kunalfarmah.k_gpt.viewmodel.GeminiViewModel
 
 @Preview
 @Composable
-fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hiltViewModel()) {
-    ChatScreen(modifier, viewModel, "Gemini")
+fun GeminiScreen(modifier: Modifier = Modifier, viewModel: GeminiViewModel = hiltViewModel(), textMode: Boolean = true, setTextMode: (Boolean) -> Unit = {}) {
+    ChatScreen(modifier = modifier, viewModel = viewModel, platform = "Gemini", textMode = textMode, setTextMode = setTextMode)
 }

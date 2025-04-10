@@ -158,7 +158,7 @@ fun KeepScreenOn() {
 
 @Preview
 @Composable
-fun Input(modifier: Modifier = Modifier, placeHolder: String = "", onSend: (String) -> Unit = {}, isThinking: Boolean = false, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}, onGenerateImage: () -> Unit = {}, onAttachImage: () -> Unit = {}){
+fun Input(modifier: Modifier = Modifier, placeHolder: String = "", onSend: (String) -> Unit = {}, isThinking: Boolean = false, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}, onAttachImage: () -> Unit = {}){
     var text by rememberSaveable {
         mutableStateOf("")
     }
@@ -204,13 +204,13 @@ fun Input(modifier: Modifier = Modifier, placeHolder: String = "", onSend: (Stri
                 disabledIndicatorColor = Color.Transparent // Hide the indicator line when disabled
             ),
             trailingIcon = {
-                Row{
-                    IconButton(onClick = onAttachImage){
-                        Icon(modifier = Modifier.padding(end = 0.dp), painter= painterResource(R.drawable.baseline_attach_file_24), tint = MaterialTheme.colorScheme.primary, contentDescription = "image")
-                    }
-                    IconButton(onClick = onGenerateImage){
-                        Icon(painter = painterResource(R.drawable.baseline_image_24), tint = MaterialTheme.colorScheme.primary, contentDescription = "image")
-                    }
+                IconButton(onClick = onAttachImage) {
+                    Icon(
+                        modifier = Modifier.padding(end = 0.dp),
+                        painter = painterResource(R.drawable.baseline_attach_file_24),
+                        tint = MaterialTheme.colorScheme.primary,
+                        contentDescription = "image"
+                    )
                 }
             }
         )
@@ -399,15 +399,17 @@ fun DisplayImageWithDownload(imageData: String, mimeType: String, isUserMessage:
 
 @Preview
 @Composable
-fun ModeSwitch(modifier: Modifier = Modifier, onToggle: (Boolean) -> Unit = {}){
-    var textMode by rememberSaveable {
+fun ModeSwitch(modifier: Modifier = Modifier, textMode: Boolean = true, onToggle: (Boolean) -> Unit = {}){
+    var isToggled by rememberSaveable {
         mutableStateOf(false)
+    }
+    LaunchedEffect(textMode) {
+        isToggled = !textMode
     }
     Row(modifier = modifier.padding(start = 10.dp), verticalAlignment = Alignment.CenterVertically){
         Text(text = "Text", color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
-        Switch(checked = textMode, onCheckedChange = {
+        Switch(checked = isToggled, onCheckedChange = {
             onToggle(!textMode)
-            textMode = !textMode
         }, colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.secondary, uncheckedTrackColor = MaterialTheme.colorScheme.secondary, checkedThumbColor = MaterialTheme.colorScheme.primary, uncheckedThumbColor = MaterialTheme.colorScheme.primary))
         Text(text = "Image", color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
     }
@@ -592,28 +594,25 @@ fun ThinkingBubble(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-fun ModelSpinner(modifier: Modifier = Modifier, initialModel:  String = "", type: String = "Gemini", onModelSelected: (String) -> Unit = {}) {
+fun ModelSpinner(modifier: Modifier = Modifier, models:  List<String> = listOf<String>(), type: String = "Gemini", onModelSelected: (String) -> Unit = {}) {
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
-    val modelsList = type.let {
-        if(it=="Gemini"){
-            Constants.geminiModels
-        }
-        else{
-            Constants.openAIModels
-        }
+    var modelsList by rememberSaveable {
+        mutableStateOf(models)
     }
+
     var selectedModel by rememberSaveable {
-        mutableStateOf("")
+        mutableStateOf(modelsList[0])
     }
 
     var parentWidth by remember {
         mutableStateOf(0.dp)
     }
 
-    LaunchedEffect(initialModel) {
-        selectedModel = initialModel
+    LaunchedEffect(models) {
+        modelsList = models
+        selectedModel = modelsList[0]
     }
 
     Row (modifier = modifier
