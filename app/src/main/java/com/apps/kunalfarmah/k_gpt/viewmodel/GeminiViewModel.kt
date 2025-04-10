@@ -132,7 +132,8 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
                     setImageData(
                         ImageData(
                             base64Data = messageResponse.inlineData.data,
-                            mimeType = messageResponse.inlineData.mimeType
+                            mimeType = messageResponse.inlineData.mimeType,
+                            platform = "Gemini"
                         )
                     )
                     Message(
