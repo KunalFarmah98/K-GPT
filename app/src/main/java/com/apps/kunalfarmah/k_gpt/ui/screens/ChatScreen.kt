@@ -6,11 +6,14 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -52,6 +55,7 @@ import com.apps.kunalfarmah.k_gpt.ui.components.ChatBubble
 import com.apps.kunalfarmah.k_gpt.ui.components.Input
 import com.apps.kunalfarmah.k_gpt.ui.components.KeepScreenOn
 import com.apps.kunalfarmah.k_gpt.ui.components.MaxTokensDialog
+import com.apps.kunalfarmah.k_gpt.ui.components.ModeSwitch
 import com.apps.kunalfarmah.k_gpt.ui.components.ModelSpinner
 import com.apps.kunalfarmah.k_gpt.ui.components.ThinkingBubble
 import com.apps.kunalfarmah.k_gpt.viewmodel.base.ChatViewModel
@@ -191,7 +195,13 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         Column(
             modifier = modifier.imePadding()
         ) {
-            ModelSpinner(type = platform, initialModel = model, onModelSelected = { model = it })
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+                ModeSwitch(onToggle = {
+
+                })
+                Text(modifier = Modifier.padding(start = 10.dp, end=10.dp), text = "|", fontSize = 20.sp)
+                ModelSpinner(type = platform, initialModel = model, onModelSelected = { model = it })
+            }
             LazyColumn(
                 modifier = Modifier
                     .padding(8.dp)

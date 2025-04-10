@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -42,7 +41,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.IconButton
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -59,6 +61,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -95,6 +99,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -392,6 +397,22 @@ fun DisplayImageWithDownload(imageData: String, mimeType: String, isUserMessage:
     }
 }
 
+@Preview
+@Composable
+fun ModeSwitch(modifier: Modifier = Modifier, onToggle: (Boolean) -> Unit = {}){
+    var textMode by rememberSaveable {
+        mutableStateOf(false)
+    }
+    Row(modifier = modifier.padding(start = 10.dp), verticalAlignment = Alignment.CenterVertically){
+        Text(text = "Text", color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
+        Switch(checked = textMode, onCheckedChange = {
+            onToggle(!textMode)
+            textMode = !textMode
+        }, colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.secondary, uncheckedTrackColor = MaterialTheme.colorScheme.secondary, checkedThumbColor = MaterialTheme.colorScheme.primary, uncheckedThumbColor = MaterialTheme.colorScheme.primary))
+        Text(text = "Image", color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
+    }
+}
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Preview
@@ -597,8 +618,8 @@ fun ModelSpinner(modifier: Modifier = Modifier, initialModel:  String = "", type
 
     Row (modifier = modifier
         .fillMaxWidth()
-        .padding(top = 10.dp, end = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End){
-        Text(text = "AI Model:  ", color = MaterialTheme.colorScheme.onSurface)
+        .padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End){
+        Text(text = stringResource(R.string.ai_model), color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
         Box(modifier = Modifier
             .onGloballyPositioned {
                 parentWidth = it.size.toSize().width.dp
@@ -628,7 +649,7 @@ fun ModelSpinner(modifier: Modifier = Modifier, initialModel:  String = "", type
             ) {
                 modelsList.forEachIndexed { index, item ->
                     DropdownMenuItem(
-                        text = { Text(item) },
+                        text = { Text(text = item, fontSize = 15.sp) },
                         onClick = {
                             expanded = false
                             selectedModel = item
