@@ -274,6 +274,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
             Input(
                 onSend = { text ->
                     if (text.isNotBlank()) {
+                        isResponding = true
                         model.let { model ->
                             if (!isTextMode) {
                                 viewModel.generateImage(model = model, request = text)
@@ -283,7 +284,6 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                                     request = text,
                                     maxTokens = maxTokens
                                 )
-                                isResponding = true
                             }
                         }
                     }
