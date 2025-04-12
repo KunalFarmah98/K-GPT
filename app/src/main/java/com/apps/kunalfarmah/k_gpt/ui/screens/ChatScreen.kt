@@ -56,6 +56,7 @@ import com.apps.kunalfarmah.k_gpt.ui.components.ModeSwitch
 import com.apps.kunalfarmah.k_gpt.ui.components.ModelSpinner
 import com.apps.kunalfarmah.k_gpt.ui.components.ThinkingBubble
 import com.apps.kunalfarmah.k_gpt.viewmodel.base.ChatViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -257,6 +258,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                         message = it,
                         listState = listState,
                         isResponding = isResponding,
+                        isThinking = false,
                         onResponseCompleted = {
                             isResponding = false
                         },
@@ -305,9 +307,12 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                 isThinking = isLoading,
                 onResponseStopped = {
                     isResponding = false
-                    scope.launch {
-                        listState.scrollToItem(messages.value.size - 1, chatBubbleSize)
-                    }
+                    try {
+                        scope.launch {
+                            delay(100)
+                            listState.scrollToItem(messages.value.size - 1, chatBubbleSize)
+                        }
+                    } catch (_: Exception) {}
                 })
         }
     }
