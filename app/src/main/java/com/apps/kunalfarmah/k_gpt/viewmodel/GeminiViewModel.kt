@@ -26,7 +26,7 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
                 text = request
             )
         )
-        _imageData.value.let {
+        _imageData.let {
             if(it.base64Data != null) {
                 parts.add(
                     Part(
@@ -83,7 +83,7 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
                 text = request
             )
         )
-        _imageData.value.let {
+        _imageData.let {
             if(it.base64Data != null) {
                 parts.add(
                     Part(

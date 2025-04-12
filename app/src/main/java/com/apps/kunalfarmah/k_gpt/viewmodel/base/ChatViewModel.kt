@@ -25,7 +25,7 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
     protected val _historyLoading = MutableSharedFlow<Event.HistoryLoading>(replay = 1)
     val historyLoading = _historyLoading.asSharedFlow()
 
-    protected val _imageData = MutableStateFlow<ImageData>(ImageData())
+    internal var _imageData = ImageData()
 
     var imageToBeDownloaded: ImageData ?= null
     private set
@@ -70,7 +70,7 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
     }
 
     fun setImageData(imageData: ImageData){
-        _imageData.value = imageData
+        _imageData = imageData
     }
 
     fun alert(event: Event){
@@ -80,11 +80,11 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
     }
 
     fun setUploadImageData(base64Data: String, mimeType: String){
-        _imageData.value = ImageData(base64Data = base64Data, mimeType = mimeType)
+        _imageData = ImageData(base64Data = base64Data, mimeType = mimeType)
     }
 
     fun clearImageData(){
-        _imageData.value = ImageData()
+        _imageData = ImageData()
     }
 
     fun clearDownloadedImageData(){

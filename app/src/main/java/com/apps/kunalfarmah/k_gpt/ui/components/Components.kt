@@ -515,7 +515,9 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             // do not animate user messages or messages from history
             if(message.isImage){
                 DisplayImageWithDownload(imageData = message.imageData!!, mimeType = message.mimeType!!, isUserMessage = message.isUser, onDownloadClick = onDownloadClick)
-                onResponseCompleted()
+                if(!message.isUser){
+                    onResponseCompleted()
+                }
             }
             else if (message.isUser || isThinking) {
                 Text(text = message.text, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onPrimary)
