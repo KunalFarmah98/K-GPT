@@ -92,13 +92,17 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
     }
 
     fun uploadImageToMessages(base64Data: String, mimeType: String){
-        _messages.value +=  Message(
+        val image = Message(
             isUser = true,
             platform = "Gemini",
             isImage = true,
             imageData = base64Data,
             mimeType = mimeType
         )
+        _messages.value += image
+        viewModelScope.launch(Dispatchers.IO) {
+            messagesRepository.insertMessage(image)
+        }
     }
 
     abstract fun generateResponse(model: String, request: String, maxTokens: Int? = null)
