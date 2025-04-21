@@ -242,6 +242,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                     .padding(8.dp)
                     .fillMaxWidth()
                     .weight(1f)
+
                     .onSizeChanged {
                         currentContentSize = it
                     },

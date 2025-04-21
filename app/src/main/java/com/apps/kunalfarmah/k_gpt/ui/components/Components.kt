@@ -615,7 +615,7 @@ fun ModelSpinner(modifier: Modifier = Modifier, models:  List<String> = listOf<S
     Row (modifier = modifier
         .fillMaxWidth()
         .padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End){
-        Text(text = stringResource(R.string.ai_model), color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
+        //Text(text = stringResource(R.string.ai_model), color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
         Box(modifier = Modifier
             .onGloballyPositioned {
                 parentWidth = it.size.toSize().width.dp
@@ -629,8 +629,9 @@ fun ModelSpinner(modifier: Modifier = Modifier, models:  List<String> = listOf<S
                 modifier = Modifier
                     .clip(RectangleShape)
                     .border(width = 1.dp, color = MaterialTheme.colorScheme.primary)
+                    .padding(horizontal = 2.dp)
+                    .width(250.dp)
                     .padding(2.dp)
-                    .width(200.dp)
                     .clickable {
                         expanded = true
                     }

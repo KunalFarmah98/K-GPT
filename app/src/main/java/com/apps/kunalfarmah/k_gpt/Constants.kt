@@ -2,6 +2,7 @@ package com.apps.kunalfarmah.k_gpt
 
 
 enum class GeminiTextModels(val modelName: String) {
+    GEMINI_2_5_FLASH("gemini-2.5-flash-preview-04-17"),
     GEMINI_2_5_PRO("gemini-2.5-pro-exp-03-25"),
     GEMINI_2_0_FLASH("gemini-2.0-flash"),
     GEMINI_2_0_FLASH_LITE("gemini-2.0-flash-lite"),
@@ -22,6 +23,8 @@ enum class GeminiImageModels(val modelName: String) {
 }
 
 enum class OpenAITextModels(val modelName: String) {
+    GPT_4_1_MINI("gpt-4.1-mini"),
+    GPT_4_1("gpt-4.1"),
     GPT_4O_MINI("gpt-4o-mini"),
     GPT_4O("gpt-4o"),
     GPT_3_5_TURBO("gpt-3.5-turbo"),
