@@ -23,64 +23,64 @@
 # Screenshots
 
 <p vspace = "20" align="center" >
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_hi.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/openai_hi.png">
-   <img width="180" height="350" hspace="10"  src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_thinking.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_responding.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_hi.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/openai_hi.png">
+   <img width="180" height="350" hspace="10"  src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_thinking.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_responding.png">
 </p>
 
 <br />
 
 <p vspace = "20" align="center" >
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_response.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/typing.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/openai_responding.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/openai_response.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_response.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/typing.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/openai_responding.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/openai_response.png">
 </p>
 
 <br />
 
 <p vspace = "20" align="center" >
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_text_models.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_image_models.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/openai_text_models.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/openai_image_models.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_text_models.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_image_models.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/openai_text_models.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/openai_image_models.png">
 </p>
 
 <br />
 
 <p vspace = "20" align="center" >
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_options_menu.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/openai_options_menu.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/set_tokens.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/concise_response.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_options_menu.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/openai_options_menu.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/set_tokens.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/concise_response.png">
 </p>
 
 <br />
 
 <p vspace = "20" align="center" >
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/copy.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_history.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_history.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_image_thinking.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/copy.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_history.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_history.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_image_thinking.png">
 
 </p>
 
 <br />
 
 <p vspace = "20" align="center" >
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_image_response.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_image_editing_thinking.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_image_editing_response.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_image_explain.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_image_response.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_image_editing_thinking.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_image_editing_response.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_image_explain.png">
 </p>
 
 <br />
 
 <p vspace = "20" align="center" >
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/gemini_image_upload_and_edit.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/save_image.png">
-   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/main/res/raw/saved_image.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/gemini_image_upload_and_edit.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/save_image.png">
+   <img width="180" height="350" hspace="10" src="https://github.com/KunalFarmah98/K-GPT/blob/main/app/src/debug/res/raw/saved_image.png">
 </p>
   
 
