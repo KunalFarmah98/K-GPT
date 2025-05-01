@@ -2,8 +2,6 @@ import java.util.*
 val properties = Properties().apply {
     rootProject.file("local.properties").reader().use(::load)
 }
-val geminiApiKey = properties["geminiApiKey"] as String
-val openAIApiKey = properties["openAIApiKey"] as String
 
 plugins {
     alias(libs.plugins.android.application)
@@ -22,17 +20,18 @@ android {
         applicationId = "com.apps.kunalfarmah.k_gpt"
         minSdk = 24
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "GEMINI_API_KEY", geminiApiKey)
-        buildConfigField("String", "OPEN_AI_API_KEY", openAIApiKey)
+        buildConfigField("String", "GEMINI_API_KEY", properties["geminiApiKey"] as String)
+        buildConfigField("String", "OPEN_AI_API_KEY",  properties["openAIApiKey"] as String)
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
