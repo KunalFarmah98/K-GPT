@@ -2,6 +2,7 @@ package com.apps.kunalfarmah.k_gpt.viewmodel.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.apps.kunalfarmah.k_gpt.data.ImageData
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.network.model.Event
 import com.apps.kunalfarmah.k_gpt.repository.base.MessagesRepository
@@ -14,18 +15,23 @@ import kotlinx.coroutines.launch
 import java.util.Date
 
 abstract class ChatViewModel(private val messagesRepository: MessagesRepository): ViewModel() {
-    internal val _messages = MutableStateFlow<List<Message>>(listOf())
+    protected val _messages = MutableStateFlow<List<Message>>(listOf())
     val messages = _messages.asStateFlow()
 
-    internal val _isLoading = MutableStateFlow<Boolean>(false)
+    protected val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading.asStateFlow()
 
     // history loading state needs to be shared by all screen so we need a replay cache
-    internal val _historyLoading = MutableSharedFlow<Event.HistoryLoading>(replay = 1)
+    protected val _historyLoading = MutableSharedFlow<Event.HistoryLoading>(replay = 1)
     val historyLoading = _historyLoading.asSharedFlow()
 
+    internal var _imageData = ImageData()
+
+    var imageToBeDownloaded: ImageData ?= null
+    private set
+
     // alerts are one time events, so no replay cache required here
-    internal val _alerts = MutableSharedFlow<Event>()
+    protected val _alerts = MutableSharedFlow<Event>()
     val alerts = _alerts.asSharedFlow()
 
     init {
@@ -59,5 +65,48 @@ abstract class ChatViewModel(private val messagesRepository: MessagesRepository)
         }
     }
 
-    abstract fun generateRequest(model: String, request: String, maxTokens: Int? = null)
+    fun setDownloadedImageData(imageData: ImageData){
+        imageToBeDownloaded = imageData
+    }
+
+    fun setImageData(imageData: ImageData){
+        _imageData = imageData
+    }
+
+    fun alert(event: Event){
+        viewModelScope.launch {
+            _alerts.emit(event)
+        }
+    }
+
+    fun setUploadImageData(base64Data: String, mimeType: String){
+        _imageData = ImageData(base64Data = base64Data, mimeType = mimeType)
+    }
+
+    fun clearImageData(){
+        _imageData = ImageData()
+    }
+
+    fun clearDownloadedImageData(){
+        imageToBeDownloaded = null
+    }
+
+    fun uploadImageToMessages(base64Data: String, mimeType: String){
+        val image = Message(
+            isUser = true,
+            platform = "Gemini",
+            isImage = true,
+            imageData = base64Data,
+            mimeType = mimeType
+        )
+        _messages.value += image
+        viewModelScope.launch(Dispatchers.IO) {
+            messagesRepository.insertMessage(image)
+        }
+    }
+
+    abstract fun generateResponse(model: String, request: String, maxTokens: Int? = null)
+
+    abstract fun generateImage(model: String, request: String, maxTokens: Int? = null)
+
 }

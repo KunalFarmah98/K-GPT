@@ -2,8 +2,11 @@ package com.apps.kunalfarmah.k_gpt.ui.screens
 
 import android.view.ViewTreeObserver
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -12,8 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -37,8 +41,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.apps.kunalfarmah.k_gpt.GeminiModels
-import com.apps.kunalfarmah.k_gpt.OpenAIModels
+import com.apps.kunalfarmah.k_gpt.Constants
+import com.apps.kunalfarmah.k_gpt.MainActivity
+import com.apps.kunalfarmah.k_gpt.data.ImageData
 import com.apps.kunalfarmah.k_gpt.dataStore
 import com.apps.kunalfarmah.k_gpt.getMaxTokens
 import com.apps.kunalfarmah.k_gpt.network.model.Event
@@ -47,6 +52,7 @@ import com.apps.kunalfarmah.k_gpt.ui.components.ChatBubble
 import com.apps.kunalfarmah.k_gpt.ui.components.Input
 import com.apps.kunalfarmah.k_gpt.ui.components.KeepScreenOn
 import com.apps.kunalfarmah.k_gpt.ui.components.MaxTokensDialog
+import com.apps.kunalfarmah.k_gpt.ui.components.ModeSwitch
 import com.apps.kunalfarmah.k_gpt.ui.components.ModelSpinner
 import com.apps.kunalfarmah.k_gpt.ui.components.ThinkingBubble
 import com.apps.kunalfarmah.k_gpt.viewmodel.base.ChatViewModel
@@ -54,25 +60,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltViewModel(), platform: String){
+fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltViewModel(), platform: String, textMode: Boolean, setTextMode: (Boolean) -> Unit){
 
     var messages = viewModel.messages.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+
     var messagesLoading by rememberSaveable {
         mutableStateOf(false)
     }
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    var model by rememberSaveable {
-        mutableStateOf(platform.let{
-            if(it == "OpenAI"){
-                OpenAIModels.GPT_4O_MINI.modelName
-            }
-            else{
-                GeminiModels.GEMINI_2_5_PRO.modelName
-            }
-        })
-    }
     var isResponding by remember{
         mutableStateOf(false)
     }
@@ -87,6 +84,35 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
 
     var limitExceededError by remember {
         mutableStateOf("")
+    }
+
+    var isTextMode by remember {
+        mutableStateOf(textMode)
+    }
+
+    var models by remember {
+        mutableStateOf(platform.let{
+            if(it == "Gemini"){
+                if(isTextMode) {
+                    Constants.geminiTextModels
+                }
+                else{
+                    Constants.geminiImageModels
+                }
+            }
+            else{
+                if(isTextMode) {
+                    Constants.openAITextModels
+                }
+                else{
+                    Constants.openAIImageModels
+                }
+            }
+        })
+    }
+
+    var model by rememberSaveable {
+        mutableStateOf(models[0])
     }
 
     var previousContentSize by remember { mutableStateOf(IntSize(0,0)) }
@@ -137,6 +163,27 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         }
     }
 
+    LaunchedEffect(models) {
+        model = models[0]
+    }
+
+    LaunchedEffect(textMode) {
+        isTextMode = textMode
+        models = if(textMode){
+            if(platform == "Gemini"){
+                Constants.geminiTextModels
+            } else{
+                Constants.openAITextModels
+            }
+        } else {
+            if (platform == "Gemini") {
+                Constants.geminiImageModels
+            } else {
+                Constants.openAIImageModels
+            }
+        }
+    }
+
     // Access the current View and keyboard visibility state
     val view = LocalView.current
     var isImeVisible by remember { mutableStateOf(false) }
@@ -165,7 +212,7 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
         }
     }
 
-    if(isResponding){
+    if(isResponding || isLoading || messagesLoading){
         KeepScreenOn()
     }
 
@@ -176,19 +223,26 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
             verticalArrangement = Arrangement.Center
         ) {
             CircularProgressIndicator(modifier = Modifier.size(40.dp))
-            Text(text = "Loading $platform message history", modifier = Modifier.padding(20.dp), fontSize = 15.sp)
+            Text(text = "Loading $platform message history", modifier = Modifier.padding(20.dp), fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface)
         }
-    }
-    else {
+    } else {
         Column(
             modifier = modifier.imePadding()
         ) {
-            ModelSpinner(type = platform, onModelSelected = { model = it })
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+                ModeSwitch(textMode = textMode, onToggle = {
+                    viewModel.clearImageData()
+                    setTextMode(it)
+                })
+                Text(modifier = Modifier.padding(start = 10.dp, end=10.dp), text = "|", fontSize = 20.sp)
+                ModelSpinner(type = platform, models = models, onModelSelected = { model = it })
+            }
             LazyColumn(
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth()
                     .weight(1f)
+
                     .onSizeChanged {
                         currentContentSize = it
                     },
@@ -205,8 +259,12 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                         message = it,
                         listState = listState,
                         isResponding = isResponding,
+                        isThinking = false,
                         onResponseCompleted = {
                             isResponding = false
+                        },
+                        onImageSelected = { imageData ->
+                            viewModel.setDownloadedImageData(ImageData(bitmap = imageData.bitmap, mimeType = imageData.mimeType, platform = platform))
                         }
                     )
                 }
@@ -217,24 +275,45 @@ fun ChatScreen(modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltVie
                 }
             }
             Input(
-                onSend = {
-                    if (it.isNotBlank()) {
-                        viewModel.generateRequest(
-                            model = model,
-                            request = it,
-                            maxTokens = maxTokens
-                        )
+                onSend = { text ->
+                    if (text.isNotBlank()) {
                         isResponding = true
+                        model.let { model ->
+                            if (!isTextMode) {
+                                viewModel.generateImage(model = model, request = text)
+                            } else {
+                                viewModel.generateResponse(
+                                    model = model,
+                                    request = text,
+                                    maxTokens = maxTokens
+                                )
+                            }
+                        }
                     }
                 },
+                onAttachImage = {
+                  viewModel.clearImageData()
+                    (context as MainActivity).pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+                },
+                placeHolder =
+                    model.let {
+                        if (!isTextMode) {
+                            "Enter your image prompt"
+                        } else {
+                            "Enter your message"
+                        }
+
+                    },
                 isResponding = !isLoading && isResponding,
                 isThinking = isLoading,
                 onResponseStopped = {
                     isResponding = false
-                    scope.launch {
-                        delay(100)
-                        listState.scrollToItem(messages.value.size - 1, chatBubbleSize)
-                    }
+                    try {
+                        scope.launch {
+                            delay(100)
+                            listState.scrollToItem(messages.value.size - 1, chatBubbleSize)
+                        }
+                    } catch (_: Exception) {}
                 })
         }
     }

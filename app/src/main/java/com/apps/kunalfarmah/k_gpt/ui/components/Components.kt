@@ -1,6 +1,8 @@
 package com.apps.kunalfarmah.k_gpt.ui.components
 
 import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
 import android.util.Log
 import android.view.ViewTreeObserver
@@ -28,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -38,7 +41,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.IconButton
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -79,7 +84,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
@@ -89,6 +96,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -96,6 +104,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -114,8 +123,9 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.apps.kunalfarmah.k_gpt.Constants
+import com.apps.kunalfarmah.k_gpt.MainActivity
 import com.apps.kunalfarmah.k_gpt.R
+import com.apps.kunalfarmah.k_gpt.data.ImageData
 import com.apps.kunalfarmah.k_gpt.data.Message
 import com.apps.kunalfarmah.k_gpt.ui.screens.Screens
 import com.apps.kunalfarmah.k_gpt.ui.screens.bottomTabs
@@ -143,7 +153,7 @@ fun KeepScreenOn() {
 
 @Preview
 @Composable
-fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, isThinking: Boolean = false, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}){
+fun Input(modifier: Modifier = Modifier, placeHolder: String = "", onSend: (String) -> Unit = {}, isThinking: Boolean = false, isResponding: Boolean = false, onResponseStopped: () -> Unit = {}, onAttachImage: () -> Unit = {}){
     var text by rememberSaveable {
         mutableStateOf("")
     }
@@ -164,7 +174,7 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, isThinki
                     width = Dimension.fillToConstraints
                 }
                 .padding(8.dp),
-            placeholder = { Text("Enter your message") },
+            placeholder = { Text(placeHolder) },
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Send,
                 autoCorrectEnabled = false,
@@ -187,7 +197,17 @@ fun Input(modifier: Modifier = Modifier, onSend: (String) -> Unit = {}, isThinki
                 focusedIndicatorColor = Color.Transparent, // Hide the indicator line when focused
                 unfocusedIndicatorColor = Color.Transparent, // Hide the indicator line when not focused
                 disabledIndicatorColor = Color.Transparent // Hide the indicator line when disabled
-            )
+            ),
+            trailingIcon = {
+                IconButton(onClick = onAttachImage) {
+                    Icon(
+                        modifier = Modifier.padding(end = 0.dp),
+                        painter = painterResource(R.drawable.baseline_attach_file_24),
+                        tint = MaterialTheme.colorScheme.primary,
+                        contentDescription = "image"
+                    )
+                }
+            }
         )
         Card(
             modifier
@@ -329,10 +349,72 @@ fun AnimatedStyledText(text: String, color: Color = Color.Unspecified, animateTe
         }, textAlign = TextAlign.Start, color = color)
 }
 
+@Composable
+fun DisplayImageWithDownload(imageData: String, mimeType: String, isUserMessage: Boolean = false, onDownloadClick: (bitmap: Bitmap) -> Unit = {}) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val bitmap = Util.decodeImage(imageData, mimeType)
+        if (bitmap != null) {
+            Box {
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = "Decoded Image",
+                    contentScale = ContentScale.Fit
+                )
+                if(!isUserMessage) {
+                    Card(
+                        onClick = { onDownloadClick(bitmap) },
+                        colors = CardDefaults.cardColors()
+                            .copy(containerColor = MaterialTheme.colorScheme.primary),
+                        modifier = Modifier
+                            .size(45.dp)
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 8.dp, bottom = 8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(20.dp),
+                                painter = painterResource(R.drawable.baseline_download_24),
+                                contentDescription = "Download Image",
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
+                }
+            }
+        } else {
+            // Handle the case where decoding fails (e.g., display an error message)
+            // For now, we'll just leave it empty.
+        }
+    }
+}
+
+@Preview
+@Composable
+fun ModeSwitch(modifier: Modifier = Modifier, textMode: Boolean = true, onToggle: (Boolean) -> Unit = {}){
+    var isToggled by rememberSaveable {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(textMode) {
+        isToggled = !textMode
+    }
+    Row(modifier = modifier.padding(start = 10.dp), verticalAlignment = Alignment.CenterVertically){
+        Text(text = "Text", color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
+        Switch(checked = isToggled, onCheckedChange = {
+            onToggle(!textMode)
+        }, colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.secondary, uncheckedTrackColor = MaterialTheme.colorScheme.secondary, checkedThumbColor = MaterialTheme.colorScheme.primary, uncheckedThumbColor = MaterialTheme.colorScheme.primary))
+        Text(text = "Image", color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
+    }
+}
+
+
 @OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Composable
-fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = "Hello"), isThinking: Boolean = false, listState: LazyListState = rememberLazyListState(), isResponding: Boolean=false, onResponseCompleted: () -> Unit = {}){
+fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = "Hello"), isThinking: Boolean = false, listState: LazyListState = rememberLazyListState(), isResponding: Boolean=false, onResponseCompleted: () -> Unit = {}, onImageSelected: (ImageData) -> Unit = {}){
     val isUser = message.isUser
     val coroutineScope = rememberCoroutineScope()
     val bubbleShape = RoundedCornerShape(
@@ -357,9 +439,47 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
         .widthIn(min = 50.dp, max = (screenWidth * 0.8f).toInt().dp)
 
     val haptic = LocalHapticFeedback.current
-
+    var onDownloadClick: (bitmap: Bitmap) -> Unit = {}
+    var fileName = ""
     boxModifier = if (isThinking) {
         boxModifier.width(100.dp)
+    }
+    else if (message.isImage) {
+        if (message.isUser) {
+            boxModifier.sizeIn(maxWidth = 200.dp, maxHeight = 200.dp)
+        } else {
+            fileName = "K-GPT_Image_${Util.getImageTime(message.time)}".plus(
+                when (message.mimeType) {
+                    "image/jpeg" -> ".jpg"
+                    "image/png" -> ".png"
+                    else -> ".jpg"
+                }
+            )
+            onDownloadClick = { bitmap ->
+                onImageSelected(ImageData(bitmap = bitmap, mimeType = message.mimeType))
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = message.mimeType
+                    putExtra(Intent.EXTRA_TITLE, fileName)
+                }
+                (context as MainActivity).saveImageLauncher.launch(intent)
+            }
+            boxModifier
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = ripple(bounded = true),
+                    onClick = {},
+                    onLongClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onDownloadClick(
+                            Util.decodeImage(
+                                message.imageData!!,
+                                message.mimeType ?: "image/png"
+                            )!!
+                        )
+                    }
+                )
+        }
     }
     else{
         boxModifier.combinedClickable(
@@ -382,6 +502,7 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
 
 
     var lastHeight by remember { mutableIntStateOf(0) }
+
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = if (isUser) Alignment.End else Alignment.Start) {
         if(message.firstMessageInDay){
             Text(modifier = Modifier
@@ -392,7 +513,13 @@ fun ChatBubble(modifier: Modifier = Modifier, message: Message = Message(text = 
             modifier = boxModifier
         ) {
             // do not animate user messages or messages from history
-            if (message.isUser || isThinking) {
+            if(message.isImage){
+                DisplayImageWithDownload(imageData = message.imageData!!, mimeType = message.mimeType!!, isUserMessage = message.isUser, onDownloadClick = onDownloadClick)
+                if(!message.isUser){
+                    onResponseCompleted()
+                }
+            }
+            else if (message.isUser || isThinking) {
                 Text(text = message.text, modifier = Modifier.padding(10.dp), textAlign = TextAlign.Start, color = MaterialTheme.colorScheme.onPrimary)
             }
             else if(message.fromHistory || !animateText){
@@ -464,29 +591,31 @@ fun ThinkingBubble(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-fun ModelSpinner(modifier: Modifier = Modifier, type: String = "Gemini", onModelSelected: (String) -> Unit = {}) {
+fun ModelSpinner(modifier: Modifier = Modifier, models:  List<String> = listOf<String>(), type: String = "Gemini", onModelSelected: (String) -> Unit = {}) {
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
-    val modelsList = type.let {
-        if(it=="Gemini"){
-            Constants.geminiModels
-        }
-        else{
-            Constants.openAIModels
-        }
+    var modelsList by rememberSaveable {
+        mutableStateOf(models)
     }
+
     var selectedModel by rememberSaveable {
         mutableStateOf(modelsList[0])
     }
+
     var parentWidth by remember {
         mutableStateOf(0.dp)
     }
 
+    LaunchedEffect(models) {
+        modelsList = models
+        selectedModel = modelsList[0]
+    }
+
     Row (modifier = modifier
         .fillMaxWidth()
-        .padding(top = 10.dp, end = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End){
-        Text(text = "AI Model:  ", color = MaterialTheme.colorScheme.onSurface)
+        .padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End){
+        //Text(text = stringResource(R.string.ai_model), color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
         Box(modifier = Modifier
             .onGloballyPositioned {
                 parentWidth = it.size.toSize().width.dp
@@ -495,11 +624,14 @@ fun ModelSpinner(modifier: Modifier = Modifier, type: String = "Gemini", onModel
                 text = selectedModel,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
                 modifier = Modifier
                     .clip(RectangleShape)
                     .border(width = 1.dp, color = MaterialTheme.colorScheme.primary)
+                    .padding(horizontal = 2.dp)
+                    .width(250.dp)
                     .padding(2.dp)
-                    .width(200.dp)
                     .clickable {
                         expanded = true
                     }
@@ -514,7 +646,7 @@ fun ModelSpinner(modifier: Modifier = Modifier, type: String = "Gemini", onModel
             ) {
                 modelsList.forEachIndexed { index, item ->
                     DropdownMenuItem(
-                        text = { Text(item) },
+                        text = { Text(text = item, fontSize = 15.sp) },
                         onClick = {
                             expanded = false
                             selectedModel = item

@@ -12,5 +12,8 @@ data class MessageEntity(
     val time: Long = Date().time,
     val isUser: Boolean = true,
     val text: String = "",
-    val platform: String = ""
+    val platform: String = "",
+    val isImage: Boolean = false,
+    val imageData: String? = "",
+    val mimeType: String ?= ""
 )

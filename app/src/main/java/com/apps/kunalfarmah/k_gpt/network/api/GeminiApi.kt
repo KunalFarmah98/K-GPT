@@ -1,6 +1,8 @@
 package com.apps.kunalfarmah.k_gpt.network.api
 
 import com.apps.kunalfarmah.k_gpt.BuildConfig
+import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiImageGenerationRequest
+import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiImageResponse
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiRequest
 import com.apps.kunalfarmah.k_gpt.network.model.gemini.GeminiResponse
 import retrofit2.Response
@@ -17,4 +19,11 @@ interface GeminiApi {
         @Query("key") key: String = BuildConfig.GEMINI_API_KEY,
         @Body body: GeminiRequest
     ): Response<GeminiResponse>
+
+    @POST("models/{model}")
+    suspend fun generateImage(
+        @Path("model") model: String,
+        @Query("key") key: String = BuildConfig.GEMINI_API_KEY,
+        @Body body: GeminiImageGenerationRequest
+    ): Response<GeminiImageResponse>
 }

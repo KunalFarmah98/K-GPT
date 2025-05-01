@@ -2,6 +2,7 @@ package com.apps.kunalfarmah.k_gpt.di
 
 import android.content.Context
 import androidx.room.Room
+import com.apps.kunalfarmah.k_gpt.db.MIGRATION_1_2
 import com.apps.kunalfarmah.k_gpt.db.MessageDAO
 import com.apps.kunalfarmah.k_gpt.db.MessagesDatabase
 import dagger.Module
@@ -22,7 +23,9 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             MessagesDatabase::class.java,
-            "messages_database").build()
+            "messages_database").
+            addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Singleton
