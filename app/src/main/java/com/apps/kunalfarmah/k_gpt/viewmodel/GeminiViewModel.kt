@@ -126,13 +126,15 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
                 Message(isUser = false, text = "Something went wrong", platform = "Gemini")
             }
             else {
-                val messageResponse = response.candidates[0].content.parts[0]
-                if(messageResponse.inlineData != null) {
+                val messageResponses = response.candidates[0].content.parts
+                val inlineData = messageResponses.filter { part -> part.inlineData != null }.getOrNull(0)?.inlineData
+                val text = messageResponses.filter { part -> part.text != null }.getOrNull(0)?.text
+                if(inlineData != null) {
                     // set image data so all further image based queries are made on this image
                     setImageData(
                         ImageData(
-                            base64Data = messageResponse.inlineData.data,
-                            mimeType = messageResponse.inlineData.mimeType,
+                            base64Data =inlineData.data,
+                            mimeType = inlineData.mimeType,
                             platform = "Gemini"
                         )
                     )
@@ -140,14 +142,14 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
                         isUser = false,
                         platform = "Gemini",
                         isImage = true,
-                        imageData = messageResponse.inlineData.data,
-                        mimeType = messageResponse.inlineData.mimeType
+                        imageData = inlineData.data,
+                        mimeType = inlineData.mimeType
                     )
                 }
-                else if(messageResponse.text != null){
+                else if(!text.isNullOrEmpty()){
                     Message(
                         isUser = false,
-                        text = messageResponse.text.trim(),
+                        text = text,
                         platform = "Gemini"
                     )
                 }
