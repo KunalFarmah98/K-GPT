@@ -127,8 +127,8 @@ class GeminiViewModel @Inject constructor(private val networkRepository: GeminiR
             }
             else {
                 val messageResponses = response.candidates[0].content.parts
-                val inlineData = messageResponses.filter { part -> part.inlineData != null }.getOrNull(0)?.inlineData
-                val text = messageResponses.filter { part -> part.text != null }.getOrNull(0)?.text
+                val inlineData = messageResponses.find { part -> part.inlineData != null }?.inlineData
+                val text = messageResponses.find { part -> part.text != null }?.text
                 if(inlineData != null) {
                     // set image data so all further image based queries are made on this image
                     setImageData(
