@@ -2,8 +2,9 @@ package com.apps.kunalfarmah.k_gpt
 
 
 enum class GeminiTextModels(val modelName: String) {
-    GEMINI_2_5_FLASH("gemini-2.5-flash-preview-04-17"),
-    GEMINI_2_5_PRO("gemini-2.5-pro-exp-03-25"),
+    GEMINI_2_5_FLASH_LITE("gemini-2.5-flash-lite-preview-06-17"),
+    GEMINI_2_5_FLASH("gemini-2.5-flash"),
+    GEMINI_2_5_PRO("gemini-2.5-pro"),
     GEMINI_2_0_PRO("gemini-2.0-pro-exp-02-05"),
     GEMINI_2_0_FLASH("gemini-2.0-flash"),
     GEMINI_2_0_FLASH_LITE("gemini-2.0-flash-lite"),
@@ -16,7 +17,7 @@ enum class GeminiTextModels(val modelName: String) {
 }
 
 enum class GeminiImageModels(val modelName: String) {
-    GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION("gemini-2.0-flash-exp-image-generation");
+    GEMINI_2_0_FLASH_EXP_IMAGE_GENERATION("gemini-2.0-flash-preview-image-generation");
 
     override fun toString(): String {
         return modelName

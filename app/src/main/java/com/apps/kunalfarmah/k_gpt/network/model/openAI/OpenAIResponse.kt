@@ -13,15 +13,15 @@ data class OpenAIResponse(
     @SerialName("id")
     val id: String = "",
     @SerialName("model")
-    val model: String = "",
+    val model: String? = "",
     @SerialName("object")
-    val objectX: String = "",
+    val objectX: String? = "",
     @SerialName("service_tier")
-    val serviceTier: String = "",
+    val serviceTier: String? = "",
     @SerialName("system_fingerprint")
-    val systemFingerprint: String = "",
+    val systemFingerprint: String? = "",
     @SerialName("usage")
-    val usage: Usage = Usage()
+    val usage: Usage? = Usage()
 ) {
     @Serializable
     data class Choice(
